@@ -1,0 +1,51 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15-alpine # Alpine‐based Postgres for minimal size :contentReference[oaicite:1]{index=1}
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER} # User set via .env.postgres :contentReference[oaicite:2]{index=2}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} # Password set via .env.postgres :contentReference[oaicite:3]{index=3}
+      POSTGRES_DB: ${POSTGRES_DB} # Default database name :contentReference[oaicite:4]{index=4}
+    volumes:
+      - db-data:/var/lib/postgresql/data # Persist database files across restarts :contentReference[oaicite:5]{index=5}
+    networks:
+      - app-network
+  backend:
+    build:
+      context: packages/backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env.backend
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+    command: ["node", "dist/main"]
+    depends_on:
+      - postgres # Ensure DB starts first :contentReference[oaicite:9]{index=9}
+    networks:
+      - app-network
+  frontend:
+    build:
+      context: packages/frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env.frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend # Ensure API is available :contentReference[oaicite:12]{index=12}
+    networks:
+      - app-network
+
+volumes:
+  db-data: {}
+
+networks:
+  app-network:
+    driver: bridge
