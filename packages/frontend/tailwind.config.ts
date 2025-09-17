@@ -10,10 +10,10 @@ const config: Config = {
     extend: {
       colors: {
         description: '#72767d',
-        backgroundSidebar: '#181818',
+        backgroundSidebar: '#F8F9FB',
         backgroundInput: '#0d0d0d',
-        white: '#d8dfeb'
-      }
+        black: '#141b27'
+        }
     },
   },
   plugins: [],

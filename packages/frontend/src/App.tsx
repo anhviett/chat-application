@@ -13,7 +13,7 @@ function App() {
     <Router>
       <Routes>
         {/* Start route group need protect */}
-        <Route element={<PrivateRoute><Outlet /></PrivateRoute>}>
+        {/* <Route element={<PrivateRoute><Outlet /></PrivateRoute>}> */}
           <Route
             path="/"
             element={
@@ -26,7 +26,7 @@ function App() {
               <Home />
             }
           />
-        </Route>
+        {/* </Route> */}
         {/* End route group need protect */}
         <Route path="/login" element={<Login />} />
       </Routes>
