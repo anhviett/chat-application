@@ -17,6 +17,7 @@ export default defineConfig({
       '@pages': path.resolve(__dirname, './src/pages'),
       '@layouts': path.resolve(__dirname, './src/layouts'),
       '@api': path.resolve(__dirname, './src/api'),
+      '@sockets': path.resolve(__dirname, './src/sockets'),
     },
   },
 })
