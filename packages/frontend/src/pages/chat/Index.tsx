@@ -7,7 +7,9 @@ import { useEffect, useState } from "react";
 import { socket } from "@sockets/index";
 
 const Index = () => {
-    const [chatThreadId, setChatThreadId] = useState<number | null>(null);
+    const [chatThreadId, setChatThreadId] = useState<number | null>(1);
+    const [isInfoWindowOpen, setInfoWindowOpen] = useState(true);
+    const [isToggleInvite, setToggleInvite] = useState(false);
 
     useEffect(() => {
         socket.on("connect", () => {
@@ -19,45 +21,71 @@ const Index = () => {
         };
     }, []);
 
-    const [infoTab, setInfoTab] = useState<'profile' | 'media' | 'links' | 'settings'>('profile');
+    const handleToggleInfoWindow = () => {
+        setInfoWindowOpen(prevState => !prevState);
+    }
+    const handleToggleInvite = () => {
+        setToggleInvite(prevState => !prevState);
+    }
 
     return (
         <>
-            <div className="grid grid-cols-12 gap-4 h-screen">
-                <div className="col-span-12 md:col-span-3 md:grid grid-cols-4 gap-2">
-                    <div className="sidebar-menu"><SidebarMenu onOpenInfoTab={setInfoTab} /></div>
-                    <div className="col-span-3 bg-backgroundSidebar pt-3 md:px-4 px-2 py-2.5">
-                        <div className="chat-search-header">
-                            <div className="flex items-center justify-between mb-3 text-white">
-                                <h4 className="font-bold text-xl">Chats</h4>
-                                <div className="flex items-center ml-2">
-                                    <div className="size-5 p-1 rounded-full bg-violet-600 flex items-center justify-center cursor-pointer mr-3">
-                                        <i className="fa-solid fa-plus text-sm text-white"></i>
-                                    </div>
-                                    <i className="fa-solid fa-ellipsis-vertical text-sm"></i>
+            <div className="flex h-screen">
+                {/* Sidebar Menu */}
+                <div className="w-20 flex-shrink-0">
+                    <SidebarMenu onOpenInfoTab={handleToggleInfoWindow} />
+                </div>
+
+                {/* Chat List */}
+                <div className="w-96 flex-shrink-0 bg-backgroundSidebar pt-3 md:px-4 px-2 py-2.5 border-r border-[#222224]">
+                    <div className="chat-search-header relative">
+                        <div className="flex items-center justify-between mb-3 text-white">
+                            <h4 className="font-bold text-xl text-black">Chats</h4>
+                            <div className="flex items-center ml-2">
+                                <div className="w-8 h-8 rounded-full bg-violet-600 m-auto flex items-center justify-center cursor-pointer mr-3">
+                                    <i className="fa-solid fa-plus text-sm mt-0.5"></i>
+                                </div>
+                                <div className="cursor-pointer" onClick={handleToggleInvite}>
+                                    <i className="size-5 fal fa-solid fa-ellipsis-vertical text-gray-1 text-sm"></i>
                                 </div>
                             </div>
                         </div>
-                        <div className="wrap-search">
-                            <form className="w-full flex" action="">
-                                <input type="text" className="form-control w-full text-gray-400 text-sm bg-backgroundInput p-2" placeholder="Search For Contacts or Messages" />
-                                <span className="p-2 cursor-pointer">
-                                    <i className="fa-solid fa-search text-sm text-gray-400"></i>
-                                </span>
-                            </form>
-                        </div>
+                        {/* Invite Others */}
+                        {isToggleInvite && (
+                            <div className="absolute w-auto bg-white text-black rounded-md z-[10] right-0 py-4 px-3 border border-gray-2 shadow-[0_1px_5px_1px_#f3f3f3] p-3 text-sm">
+                                <div className="flex items-center justify-center rounded-lg cursor-pointer py-2 px-3 hover:text-purple-1 hover:bg-purple-2" onClick={handleToggleInvite}>
+                                    <i className="fa-regular fa-paper-plane mr-2"></i>
+                                    <span>Invite Others</span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    <div className="search-box relative mb-4">
+                        <i className="fa-solid fa-search absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" className="w-full bg-[#0d0d0d] border border-[#222224] rounded-md pl-10 pr-4 py-2 text-white focus:outline-none" placeholder="Search" />
+                    </div>
+                    <div className="chat-tabs">
                         <RecentChat />
-                        <AllChat selectedId={chatThreadId} onChange={setChatThreadId} />
+                        <AllChat onSelectChat={setChatThreadId} />
                     </div>
                 </div>
-                <div className="col-span-12 md:col-span-6">
+
+                {/* Conversation */}
+                <div className="flex-1">
                     <Conversation chatThreadId={chatThreadId} />
                 </div>
-                <div className="hidden md:block md:col-span-3">
-                    <InfoWindow key={infoTab} />
-                </div>
+
+                {/* Info Window */}
+                {isInfoWindowOpen && (
+                    <div className="w-96 flex-shrink-0">
+                        <InfoWindow chatThreadId={chatThreadId?.toString()} onClose={handleToggleInfoWindow} />
+                    </div>
+                )}
+
+                
             </div>
         </>
     );
 };
-export default Index
+
+export default Index;

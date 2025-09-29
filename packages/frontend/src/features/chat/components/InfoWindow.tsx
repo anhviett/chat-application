@@ -3,10 +3,11 @@ import { useState } from 'react';
 type TabKey = 'profile' | 'media' | 'links' | 'settings';
 
 type InfoWindowProps = {
-    chatThreadId?: string
+    chatThreadId?: string;
+    onClose?: () => void;
 }
 
-const InfoWindow = ({ chatThreadId }: InfoWindowProps) => {
+const InfoWindow = ({ chatThreadId, onClose }: InfoWindowProps) => {
     const [activeTab, setActiveTab] = useState<TabKey>('profile');
 
     return (
@@ -14,7 +15,7 @@ const InfoWindow = ({ chatThreadId }: InfoWindowProps) => {
             <div className="sticky top-0 z-10 bg-backgroundSidebar border-b border-[#222224]">
                 <div className="px-4 py-3 flex items-center justify-between">
                     <h5 className="text-white font-bold text-lg">Contact Info</h5>
-                    <i className="fa-solid fa-xmark text-white text-sm cursor-pointer"></i>
+                    <i onClick={onClose} className="fa-solid fa-xmark text-white text-sm cursor-pointer"></i>
                 </div>
                 <div className="px-2 pb-2">
                     <div className="grid grid-cols-4 gap-2">
@@ -40,14 +41,15 @@ const InfoWindow = ({ chatThreadId }: InfoWindowProps) => {
                         </div>
                         <div className="mt-6">
                             <h6 className="text-white font-semibold mb-2">About</h6>
-                            <p className="text-description text-sm leading-relaxed">Front-end developer. Coffee enthusiast. Love building chat apps.</p>
+                            <p className="text-description text-sm">If you can't beat 'em, join 'em.</p>
                         </div>
                         <div className="mt-6">
-                            <h6 className="text-white font-semibold mb-2">Contact</h6>
-                            <div className="space-y-2 text-sm">
-                                <div className="flex items-center text-white/90"><i className="fa-regular fa-envelope w-5 mr-2 text-description"></i> laverty@example.com</div>
-                                <div className="flex items-center text-white/90"><i className="fa-solid fa-phone w-5 mr-2 text-description"></i> +1 555 0100</div>
-                                <div className="flex items-center text-white/90"><i className="fa-solid fa-location-dot w-5 mr-2 text-description"></i> San Francisco, CA</div>
+                            <h6 className="text-white font-semibold mb-2">Social</h6>
+                            <div className="flex gap-4 text-white justify-center">
+                                <a href="#" className="text-lg"><i className="fab fa-facebook-f"></i></a>
+                                <a href="#" className="text-lg"><i className="fab fa-twitter"></i></a>
+                                <a href="#" className="text-lg"><i className="fab fa-instagram"></i></a>
+                                <a href="#" className="text-lg"><i className="fab fa-linkedin-in"></i></a>
                             </div>
                         </div>
                     </div>
@@ -80,18 +82,7 @@ const InfoWindow = ({ chatThreadId }: InfoWindowProps) => {
 
                 {activeTab === 'settings' && (
                     <div>
-                        <h6 className="text-white font-semibold mb-3">Settings</h6>
-                        <div className="space-y-4 text-sm">
-                            <label className="flex items-center justify-between text-white/90">
-                                <span>Mute notifications</span>
-                                <input type="checkbox" className="accent-violet-600" />
-                            </label>
-                            <label className="flex items-center justify-between text-white/90">
-                                <span>Block user</span>
-                                <input type="checkbox" className="accent-violet-600" />
-                            </label>
-                            <button className="w-full bg-[#2a2a2a] hover:bg-[#333] text-white rounded-md py-2">Clear chat</button>
-                        </div>
+                        <p className='text-white'>Settings content goes here...</p>
                     </div>
                 )}
             </div>

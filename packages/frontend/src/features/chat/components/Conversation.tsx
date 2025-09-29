@@ -11,7 +11,7 @@ const messages = [
     { id: 'm4', author: 'me', text: "I'll push more updates soon.", time: '10:26 AM' },
 ];
 
-const Conversation: React.FC = ({ chatThreadId }: ConversationProps) => {
+const Conversation: React.FC<ConversationProps> = ({ chatThreadId }) => {
     return (
         <div className="flex flex-col h-full bg-backgroundSidebar">
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#222224]">

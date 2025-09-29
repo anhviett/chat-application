@@ -6,9 +6,9 @@ type SidebarMenuProps = {
 
 const SidebarMenu: React.FC<SidebarMenuProps> = ({ onOpenInfoTab }) => {
     return (
-        <div className="h-full bg-backgroundSidebar border-r border-[#222224] flex flex-col items-center py-4 gap-6 max-w-20">
+        <div className="h-full bg-backgroundSidebar border-r border-[#222224] flex flex-col items-center py-4 gap-6 w-20">
             <a href="/" className="text-white" title="Home">
-                <i className="fa-solid fa-house text-lg"></i>
+                <img className="w-10 h-10" src="https://dreamschat.dreamstechnologies.com/react/template/assets/img/logo.png" alt="Logo" />
             </a>
             <button className="text-white/80 hover:text-white" title="Chats">
                 <i className="fa-solid fa-message text-lg"></i>
