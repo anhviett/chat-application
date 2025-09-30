@@ -17,9 +17,9 @@ const AllChat: React.FC<AllChatProps> = ({ onSelectChat }) => {
     ];
 
     return (
-        <div className="all-chats-section py-3">
+        <div className="all-chats-section py-1">
             <div className="flex justify-between items-center mb-4">
-                <h5 className="mb-3 font-bold text-xl text-white">All Chats</h5>
+                <h5 className="mb-3 font-bold text-xl text-black">All Chats</h5>
                 <button className="px-3 text-white/80 hover:text-white font-medium rounded-lg text-sm pb-2.5"
                     onClick={toggleDropdown}
                     type="button">
@@ -29,17 +29,28 @@ const AllChat: React.FC<AllChatProps> = ({ onSelectChat }) => {
 
             <div className="chat-list space-y-2">
                 {chats.map(chat => (
-                    <div key={chat.id} onClick={() => onSelectChat(chat.id)} className="flex items-center p-2 rounded-md cursor-pointer hover:bg-[#1a1a1a]">
+                    <div key={chat.id} onClick={() => onSelectChat(chat.id)} className="flex items-center p-5 rounded-md cursor-pointer bg-white shadow-[0_1px_5px_1px_#f3f3f3] hover:shadow-[inset_0_0_0_2px_#6338f6]">
                         <img className="w-10 h-10 rounded-full mr-3" src={`https://i.pravatar.cc/150?img=${chat.id}`} alt="avatar" />
                         <div className="flex-1">
                             <div className="flex justify-between">
-                                <h6 className="font-semibold text-white">{chat.name}</h6>
-                                <p className="text-xs text-gray-400">{chat.time}</p>
+                                <h6 className="font-semibold text-black">{chat.name}</h6>
+                                <p className="text-sm text-gray-400">{chat.time}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="text-sm text-gray-400 truncate">{chat.message}</p>
+                                <p className="">
+                                    <p className="text-gray-1 text-sm">
+                                        <span className="flex items-center space-x-1">
+                                            is typing&nbsp;&nbsp;
+                                            <span className="w-1 h-1 bg-gray-500 rounded-full animate-dot-fade-1"></span>
+                                            <span className="w-1 h-1 bg-gray-500 rounded-full animate-dot-fade-2"></span>
+                                            <span className="w-1 h-1 bg-gray-500 rounded-full animate-dot-fade-3"></span>
+                                        </span>
+                                    </p>
+                                    
+                                </p>
                                 {chat.unread > 0 && (
-                                    <span className="bg-violet-600 text-white text-xs font-bold rounded-full size-5 flex items-center justify-center">{chat.unread}</span>
+                                    <span className="bg-red-1 text-white text-xs font-bold rounded-full size-5 flex items-center justify-center">{chat.unread}</span>
                                 )}
                             </div>
                         </div>

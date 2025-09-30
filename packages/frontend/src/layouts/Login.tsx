@@ -63,7 +63,7 @@ const Login = () => {
                                     <h3 className="text-3xl text-dark font-bold text-gray-900">
                                         Welcome!
                                     </h3>
-                                    <p className="mt-1 text-md text-description">Sign in to see what you’ve missed.</p>
+                                    <p className="mt-1 text-md text-gray-1">Sign in to see what you’ve missed.</p>
                                 </div>
                                 <div>
                                     <label

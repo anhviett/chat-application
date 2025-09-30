@@ -6,10 +6,30 @@ type SidebarMenuProps = {
 
 const SidebarMenu: React.FC<SidebarMenuProps> = ({ onOpenInfoTab }) => {
     return (
-        <div className="h-full bg-backgroundSidebar border-r border-[#222224] flex flex-col items-center py-4 gap-6 w-20">
-            <a href="/" className="text-white" title="Home">
-                <img className="w-10 h-10" src="https://dreamschat.dreamstechnologies.com/react/template/assets/img/logo.png" alt="Logo" />
-            </a>
+        <div className="h-full bg-white fixed overflow-y-auto shadow-[0_1px_5px_1px_#f3f3f3] border-r border-gray-2 py-4 gap-6 w-20">
+            <div className="logo">
+                <a href="/" className="text-white" title="Home">
+                    <img className="w-10 h-10" src="https://dreamschat.dreamstechnologies.com/react/template/assets/img/logo.png" alt="Logo" />
+                </a>
+            </div>
+            <div className="menu-wrap">
+                <div className="main-menu">
+                    <ul className="nav">
+                        <li className="nav-item">
+                            <a href="#" className="nav-link">Item 1</a>
+                        </li>
+                        <li className="nav-item">
+                            <a href="#" className="nav-link">Item 2</a>
+                        </li>
+                        <li className="nav-item">
+                            <a href="#" className="nav-link">Item 3</a>
+                        </li>
+                    </ul>
+                </div>
+                <div className="profile-menu">
+
+                </div>
+            </div>
             <button className="text-white/80 hover:text-white" title="Chats">
                 <i className="fa-solid fa-message text-lg"></i>
             </button>
