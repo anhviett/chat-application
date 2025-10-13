@@ -6,7 +6,9 @@ import Chat from "@pages/chat/Index";
 const Index = () => {
     return (
         <>
-            <Chat />
+            <div className="wrapper">
+                <Chat />
+            </div>
         </>
     );
 };

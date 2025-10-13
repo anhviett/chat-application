@@ -38,16 +38,13 @@ const AllChat: React.FC<AllChatProps> = ({ onSelectChat }) => {
                             </div>
                             <div className="flex justify-between">
                                 <p className="text-sm text-gray-400 truncate">{chat.message}</p>
-                                <p className="">
-                                    <p className="text-gray-1 text-sm">
-                                        <span className="flex items-center space-x-1">
-                                            is typing&nbsp;&nbsp;
-                                            <span className="w-1 h-1 bg-gray-500 rounded-full animate-dot-fade-1"></span>
-                                            <span className="w-1 h-1 bg-gray-500 rounded-full animate-dot-fade-2"></span>
-                                            <span className="w-1 h-1 bg-gray-500 rounded-full animate-dot-fade-3"></span>
-                                        </span>
-                                    </p>
-                                    
+                                <p className="text-gray-1 text-sm">
+                                    <span className="flex items-center space-x-1">
+                                        is typing&nbsp;&nbsp;
+                                        <span className="w-1 h-1 bg-gray-500 rounded-full animate-dot-fade-1"></span>
+                                        <span className="w-1 h-1 bg-gray-500 rounded-full animate-dot-fade-2"></span>
+                                        <span className="w-1 h-1 bg-gray-500 rounded-full animate-dot-fade-3"></span>
+                                    </span>
                                 </p>
                                 {chat.unread > 0 && (
                                     <span className="bg-red-1 text-white text-xs font-bold rounded-full size-5 flex items-center justify-center">{chat.unread}</span>

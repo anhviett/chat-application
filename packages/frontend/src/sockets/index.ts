@@ -11,7 +11,7 @@ socket.on('messageToClient', (data: any) => {
 });
 
 function sendMessage(text: string, username: string) {
-    socket.emit('newMessage', { text, username });
+    // socket.emit('newMessage', { text, username });
 }
 
 // Example usage:
