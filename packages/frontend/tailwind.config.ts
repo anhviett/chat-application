@@ -16,6 +16,7 @@ const config: Config = {
         backgroundInput: '#0d0d0d',
         black: '#141b27',
         'purple-1': '#7b61ff',
+        'purple-1-hover': '#582af5',
         'purple-2': '#f1edfe',
         'red-1': '#fd3a55',
       },

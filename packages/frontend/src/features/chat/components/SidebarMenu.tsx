@@ -1,50 +1,73 @@
 import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
 type SidebarMenuProps = {
     onOpenInfoTab?: (tab: 'profile' | 'media' | 'links' | 'settings') => void;
 };
 
-const SidebarMenu: React.FC<SidebarMenuProps> = ({ onOpenInfoTab }) => {
-    return (
-        <div className="h-full bg-white overflow-y-auto shadow-[0_1px_5px_1px_#f3f3f3] border-r border-gray-2 py-4 gap-6">
-            <div className="logo">
-                <a href="/" className="text-white" title="Home">
-                    <img className="w-10 h-10" src="https://dreamschat.dreamstechnologies.com/react/template/assets/img/logo.png" alt="Logo" />
-                </a>
-            </div>
-            <div className="menu-wrap">
-                <div className="main-menu">
-                    <ul className="nav">
-                        <li className="nav-item">
-                            <a href="#" className="nav-link">Item 1</a>
-                        </li>
-                        <li className="nav-item">
-                            <a href="#" className="nav-link">Item 2</a>
-                        </li>
-                        <li className="nav-item">
-                            <a href="#" className="nav-link">Item 3</a>
-                        </li>
-                    </ul>
-                </div>
-                <div className="profile-menu">
+const SidebarMenu: React.FC<SidebarMenuProps> = () => {
+    const location = useLocation();
 
-                </div>
+    const menuItems = [
+        { icon: 'fa-regular fa-message', path: '/chat', title: 'Chats' },
+        { icon: 'fa-solid fa-user-shield', path: '/contact', title: 'Contacts' },
+        { icon: 'fa-solid fa-users', path: '/group', title: 'Groups' },
+        { icon: 'fa-regular fa-circle-dot', path: '/status', title: 'Status' },
+        { icon: 'fa-regular fa-circle-user', path: '/profile', title: 'Profile' },
+        { icon: 'fa-solid fa-gear', path: '/setting', title: 'Settings' },
+    ];
+
+    return (
+        <div className="h-full bg-white flex flex-col items-center shadow-[0_1px_5px_1px_#f3f3f3] border-r border-gray-2 py-4 gap-4">
+            {/* Logo */}
+            <div className="logo mb-4">
+                <Link to="/" title="Home">
+                    <img 
+                        className="w-10 h-10" 
+                        src="https://dreamschat.dreamstechnologies.com/react/template/assets/img/logo.png" 
+                        alt="Logo" 
+                    />
+                </Link>
             </div>
-            <button className="text-white/80 hover:text-white" title="Chats">
-                <i className="fa-solid fa-message text-lg"></i>
-            </button>
-            <button className="text-white/80 hover:text-white" title="Contacts" onClick={() => onOpenInfoTab?.('profile')}>
-                <i className="fa-solid fa-user text-lg"></i>
-            </button>
-            <button className="text-white/80 hover:text-white" title="Shared Media" onClick={() => onOpenInfoTab?.('media')}>
-                <i className="fa-regular fa-image text-lg"></i>
-            </button>
-            <button className="text-white/80 hover:text-white" title="Links" onClick={() => onOpenInfoTab?.('links')}>
-                <i className="fa-solid fa-link text-lg"></i>
-            </button>
-            <button className="text-white/80 hover:text-white mt-auto" title="Settings" onClick={() => onOpenInfoTab?.('settings')}>
-                <i className="fa-solid fa-gear text-lg"></i>
-            </button>
+
+            {/* Navigation Menu */}
+            <nav className="flex-1 flex flex-col gap-2">
+                {menuItems.map((item, index) => {
+                    const isActive = location.pathname === item.path;
+                    
+                    return (
+                        <Link
+                            key={index}
+                            to={item.path}
+                            title={item.title}
+                            className={`
+                                w-12 h-12 flex items-center justify-center rounded-lg
+                                transition-all duration-200
+                                ${isActive 
+                                    ? 'bg-purple-1 text-white' 
+                                    : 'text-gray-1 hover:bg-purple-2 hover:text-purple-1'
+                                }
+                            `}
+                        >
+                            <i className={`${item.icon} text-lg`}></i>
+                        </Link>
+                    );
+                })}
+            </nav>
+
+            {/* Profile Menu at Bottom */}
+            <div className="mt-auto">
+                <button 
+                    className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-2 hover:border-purple-1 transition-all"
+                    title="My Profile"
+                >
+                    <img 
+                        src="https://i.pravatar.cc/150?img=1" 
+                        alt="Profile" 
+                        className="w-full h-full object-cover"
+                    />
+                </button>
+            </div>
         </div>
     );
 };

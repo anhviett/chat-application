@@ -19,8 +19,8 @@ const RecentChat = () => {
                     <h5 className="font-bold text-xl text-black">Recent Chats</h5>
                 </div>
                 <Swiper
-                    spaceBetween={10}
-                    slidesPerView={'auto'}
+                    spaceBetween={20}
+                    slidesPerView={4}
                     className='online-contact-slider'
                 >
                     {slideData.map((slide) => (

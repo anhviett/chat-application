@@ -1,4 +1,5 @@
 import React from "react";
+import { useTyping } from "@contexts/TypingContext";
 
 type AllChatProps = {
     onSelectChat: (id: number) => void;
@@ -6,6 +7,8 @@ type AllChatProps = {
 
 const AllChat: React.FC<AllChatProps> = ({ onSelectChat }) => {
     const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+    const { typingUsers } = useTyping();
+
     const toggleDropdown = () => {
         setIsDropdownOpen(!isDropdownOpen);
     };
@@ -26,33 +29,47 @@ const AllChat: React.FC<AllChatProps> = ({ onSelectChat }) => {
                     <i className="fa-solid fa-filter"></i>
                 </button>
             </div>
-
             <div className="chat-list space-y-2">
-                {chats.map(chat => (
-                    <div key={chat.id} onClick={() => onSelectChat(chat.id)} className="flex items-center p-5 rounded-md cursor-pointer bg-white shadow-[0_1px_5px_1px_#f3f3f3] hover:shadow-[inset_0_0_0_2px_#6338f6]">
-                        <img className="w-10 h-10 rounded-full mr-3" src={`https://i.pravatar.cc/150?img=${chat.id}`} alt="avatar" />
-                        <div className="flex-1">
-                            <div className="flex justify-between">
-                                <h6 className="font-semibold text-black">{chat.name}</h6>
-                                <p className="text-sm text-gray-400">{chat.time}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="text-sm text-gray-400 truncate">{chat.message}</p>
-                                <p className="text-gray-1 text-sm">
-                                    <span className="flex items-center space-x-1">
-                                        is typing&nbsp;&nbsp;
-                                        <span className="w-1 h-1 bg-gray-500 rounded-full animate-dot-fade-1"></span>
-                                        <span className="w-1 h-1 bg-gray-500 rounded-full animate-dot-fade-2"></span>
-                                        <span className="w-1 h-1 bg-gray-500 rounded-full animate-dot-fade-3"></span>
-                                    </span>
-                                </p>
-                                {chat.unread > 0 && (
-                                    <span className="bg-red-1 text-white text-xs font-bold rounded-full size-5 flex items-center justify-center">{chat.unread}</span>
-                                )}
+                {chats.map(chat => {
+                    const isTyping = typingUsers[chat.id] || false;
+
+                    return (
+                        <div
+                            key={chat.id}
+                            onClick={() => onSelectChat(chat.id)}
+                            className="flex items-center p-5 rounded-md cursor-pointer bg-white shadow-[0_1px_5px_1px_#f3f3f3] hover:shadow-[inset_0_0_0_2px_#6338f6]"
+                        >
+                            <img
+                                className="w-10 h-10 rounded-full mr-3"
+                                src={`https://i.pravatar.cc/150?img=${chat.id}`}
+                                alt="avatar"
+                            />
+                            <div className="flex-1">
+                                <div className="flex justify-between">
+                                    <h6 className="font-semibold text-black">{chat.name}</h6>
+                                    <p className="text-sm text-gray-400">{chat.time}</p>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    {isTyping ? (
+                                        <p className="text-gray-1 text-sm flex items-center space-x-1">
+                                            <span>is typing</span>
+                                            <span className="w-1 h-1 bg-gray-500 rounded-full animate-dot-fade-1"></span>
+                                            <span className="w-1 h-1 bg-gray-500 rounded-full animate-dot-fade-2"></span>
+                                            <span className="w-1 h-1 bg-gray-500 rounded-full animate-dot-fade-3"></span>
+                                        </p>
+                                    ) : (
+                                        <p className="text-sm text-gray-400 truncate">{chat.message}</p>
+                                    )}
+                                    {chat.unread > 0 && !isTyping && (
+                                        <span className="bg-red-1 text-white text-xs font-bold rounded-full size-5 flex items-center justify-center">
+                                            {chat.unread}
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </div >
     );

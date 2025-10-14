@@ -3,7 +3,7 @@ import SearchSection from "@common/components/SearchSection";
 import AllChat from "@features/chat/components/AllChat";
 import Chat from "@pages/chat/Index";
 
-const Index = () => {
+const Home = () => {
     return (
         <>
             <div className="wrapper">
@@ -12,4 +12,4 @@ const Index = () => {
         </>
     );
 };
-export default Index
+export default Home

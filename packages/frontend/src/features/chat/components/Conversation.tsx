@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
+import { useTyping } from '@contexts/TypingContext';
 
 type ConversationProps = {
     chatThreadId?: number;
@@ -14,6 +15,9 @@ const messages = [
 
 const Conversation: React.FC<ConversationProps> = ({ chatThreadId, onContactInfoToggle }) => {
     const [showContactInfo, setShowContactInfo] = useState(false);
+    const [message, setMessage] = useState('');
+    const { setUserTyping } = useTyping();
+    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const handleContactInfoToggle = () => {
         const newState = !showContactInfo;
@@ -21,9 +25,44 @@ const Conversation: React.FC<ConversationProps> = ({ chatThreadId, onContactInfo
         onContactInfoToggle?.(newState); // notify parent component
     };
 
+    // Xử lý typing indicator
+    const handleTyping = useCallback((value: string) => {
+        setMessage(value);
+
+        if (!chatThreadId) return;
+
+        // Emit typing = true
+        setUserTyping(chatThreadId, true);
+
+        // Clear timeout cũ
+        if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+        }
+
+        // Set timeout mới - sau 2s không gõ thì tắt typing
+        typingTimeoutRef.current = setTimeout(() => {
+            setUserTyping(chatThreadId, false);
+        }, 500);
+    }, [chatThreadId, setUserTyping]);
+
+    const handleSendMessage = () => {
+        if (!message.trim() || !chatThreadId) return;
+
+        // TODO: Send message logic
+        console.log('Sending:', message);
+
+        // Reset
+        setMessage('');
+        setUserTyping(chatThreadId, false);
+        
+        if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+        }
+    };
+
     return (
-        <div className="flex flex-col h-full bg-white">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-2 border-b border-gray-2 shadow-[0_1px_5px_1px_#f3f3f3]">
+        <div className="flex flex-col h-full relative bg-white">
+            <div className="sticky top-0 z-10 bg-white flex items-center justify-between px-4 py-3 border-b border-gray-2 shadow-[0_1px_5px_1px_#f3f3f3]">
                 <div className="flex items-center">
                     <img className="w-10 h-10 rounded-full mr-3" src="https://dreamschat.dreamstechnologies.com/react/template/assets/img/profiles/avatar-15.jpg" alt="Avatar" />
                     <div>
@@ -74,10 +113,27 @@ const Conversation: React.FC<ConversationProps> = ({ chatThreadId, onContactInfo
 
             <div className="px-4 py-3 border-t border-gray-2">
                 <div className="flex items-center gap-2">
-                    <button className="text-white/80 hover:text-white"><i className="fa-regular fa-face-smile"></i></button>
-                    <button className="text-white/80 hover:text-white"><i className="fa-solid fa-paperclip"></i></button>
-                    <input className="flex-1 bg-gray-3 text-white text-sm px-3 py-2 rounded-md outline-none placeholder:text-gray-1" placeholder="Type your message..." />
-                    <button className="bg-violet-600 text-white px-3 py-2 rounded-md text-sm"><i className="fa-solid fa-paper-plane mr-1"></i>Send</button>
+                    <button className="text-black/80 hover:text-white"><i className="fa-regular fa-face-smile"></i></button>
+                    <button className="text-black/80 hover:text-white"><i className="fa-solid fa-paperclip"></i></button>
+                    <textarea
+                        className="flex-1 bg-gray-3 text-black text-sm px-3 py-2 rounded-md outline-none placeholder:text-gray-1 resize-none"
+                        placeholder="Type your message..."
+                        rows={1}
+                        value={message}
+                        onChange={(e) => handleTyping(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                handleSendMessage();
+                            }
+                        }}
+                    />
+                    <button
+                        onClick={handleSendMessage}
+                        className="bg-violet-600 text-white px-3 py-2 rounded-md text-sm hover:bg-violet-700 transition-colors"
+                    >
+                        <i className="fa-solid fa-paper-plane mr-1"></i>Send
+                    </button>
                 </div>
             </div>
         </div>
