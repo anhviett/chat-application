@@ -1,29 +1,28 @@
-export function defineCancelApiObject(apiObject: any) {
-    // an object that will contain a cancellation handler
-    // associated to each API property name in the apiObject API object
-    const cancelApiObject: any = {}
+export function defineCancelApiObject<T extends Record<string, any>>(apiObject: T) {
+    // A per-API-property object that exposes a cancellation handler
+    type CancelEntry = {
+        handleRequestCancellation: () => AbortController
+    }
+
+    // map of api property name -> CancelEntry
+    const cancelApiObject: Record<string, CancelEntry> = {}
 
     // each property in the apiObject API layer object
     // is associated with a function that defines an API call
-
-    // this loop iterates over each API property name
     Object.getOwnPropertyNames(apiObject).forEach((apiPropertyName) => {
-        const cancellationControllerObject: any = {
+        const cancellationControllerObject: { controller?: AbortController } = {
             controller: undefined,
         }
 
         // associating the request cancellation handler with the API property name
         cancelApiObject[apiPropertyName] = {
             handleRequestCancellation: () => {
-                // if the controller already exists,
-                // canceling the request
+                // if the controller already exists, cancel the previous request
                 if (cancellationControllerObject.controller) {
-                    // canceling the request and returning this custom message
                     cancellationControllerObject.controller.abort()
                 }
 
-                // generating a new controller
-                // with the AbortController factory
+                // generate a new controller with the AbortController factory
                 cancellationControllerObject.controller = new AbortController()
 
                 return cancellationControllerObject.controller
@@ -31,5 +30,6 @@ export function defineCancelApiObject(apiObject: any) {
         }
     })
 
-    return cancelApiObject
+    // return typed object keyed by api properties
+    return cancelApiObject as Record<keyof T & string, CancelEntry>
 }

@@ -14,7 +14,7 @@ export const userApi = {
     },
     getAll: async function (cancel = false) {
         const response = await api.request({
-            url: "/users/",
+            url: "/users",
             method: "GET",
             signal: cancel ? cancelApiObject[this.getAll.name].handleRequestCancellation().signal : undefined,
         })

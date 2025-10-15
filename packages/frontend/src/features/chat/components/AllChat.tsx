@@ -1,5 +1,5 @@
 import React from "react";
-import { useTyping } from "@contexts/TypingContext";
+import { useTyping } from "@/contexts/TypingContext";
 
 type AllChatProps = {
     onSelectChat: (id: number) => void;

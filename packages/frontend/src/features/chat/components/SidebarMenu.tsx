@@ -1,13 +1,11 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 
 type SidebarMenuProps = {
     onOpenInfoTab?: (tab: 'profile' | 'media' | 'links' | 'settings') => void;
 };
 
 const SidebarMenu: React.FC<SidebarMenuProps> = () => {
-    const location = useLocation();
-
     const menuItems = [
         { icon: 'fa-regular fa-message', path: '/chat', title: 'Chats' },
         { icon: 'fa-solid fa-user-shield', path: '/contact', title: 'Contacts' },
@@ -18,7 +16,7 @@ const SidebarMenu: React.FC<SidebarMenuProps> = () => {
     ];
 
     return (
-        <div className="h-full bg-white flex flex-col items-center shadow-[0_1px_5px_1px_#f3f3f3] border-r border-gray-2 py-4 gap-4">
+        <div className="h-full bg-white flex flex-col items-center shadow-[0_1px_5px_1px_#f3f3f3] outline-none border-r border-gray-2 py-4 gap-4">
             {/* Logo */}
             <div className="logo mb-4">
                 <Link to="/" title="Home">
@@ -32,27 +30,23 @@ const SidebarMenu: React.FC<SidebarMenuProps> = () => {
 
             {/* Navigation Menu */}
             <nav className="flex-1 flex flex-col gap-2">
-                {menuItems.map((item, index) => {
-                    const isActive = location.pathname === item.path;
-                    
-                    return (
-                        <Link
-                            key={index}
-                            to={item.path}
-                            title={item.title}
-                            className={`
-                                w-12 h-12 flex items-center justify-center rounded-lg
-                                transition-all duration-200
-                                ${isActive 
-                                    ? 'bg-purple-1 text-white' 
-                                    : 'text-gray-1 hover:bg-purple-2 hover:text-purple-1'
-                                }
-                            `}
-                        >
-                            <i className={`${item.icon} text-lg`}></i>
-                        </Link>
-                    );
-                })}
+                {menuItems.map((item, index) => (
+                    <NavLink
+                        key={index}
+                        to={item.path}
+                        title={item.title}
+                        className={({ isActive }) => `
+                            w-12 h-12 flex items-center justify-center rounded-lg
+                            transition-all duration-200
+                            ${isActive 
+                                ? 'bg-purple-1 text-white' 
+                                : 'text-gray-1 hover:bg-purple-2 hover:text-purple-1'
+                            }
+                        `}
+                    >
+                        <i className={`${item.icon} text-lg`}></i>
+                    </NavLink>
+                ))}
             </nav>
 
             {/* Profile Menu at Bottom */}

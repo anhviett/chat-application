@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { useTyping } from '@contexts/TypingContext';
+import { useTyping } from '@/contexts/TypingContext';
 
 type ConversationProps = {
     chatThreadId?: number;
@@ -69,7 +69,7 @@ const Conversation: React.FC<ConversationProps> = ({ chatThreadId, onContactInfo
                         <p className="text-white font-semibold leading-tight">
                             {
                                 chatThreadId !== null && chatThreadId !== undefined ? (
-                                    <span className="text-black text-base">Laverty {chatThreadId}</span>
+                                    <span className="text-black text-base">User {chatThreadId}</span>
                                 ) : null
                             }
                         </p>
@@ -102,7 +102,7 @@ const Conversation: React.FC<ConversationProps> = ({ chatThreadId, onContactInfo
                             <img className="w-8 h-8 rounded-full mr-2 mt-1" src={m.avatar} alt="Avatar" />
                         )}
                         <div>
-                            <div className={`max-w-[75%] rounded-2xl px-3 py-2 ${m.author === 'me' ? 'bg-violet-600 text-white rounded-br-sm' : 'bg-[#0d0d0d] text-white rounded-bl-sm'}`}>
+                            <div className={`max-w-[75%] rounded-2xl px-3 py-2 ${m.author === 'me' ? 'bg-purple-1 text-white rounded-br-sm' : 'bg-[#0d0d0d] text-white rounded-bl-sm'}`}>
                                 <p className="text-sm leading-relaxed text-white">{m.text}</p>
                             </div>
                             <div className={`mt-1 text-[10px] text-gray-1 ${m.author === 'me' ? 'text-right' : 'text-left'}`}>{m.time}</div>
@@ -141,5 +141,4 @@ const Conversation: React.FC<ConversationProps> = ({ chatThreadId, onContactInfo
 };
 
 export default Conversation;
-
 

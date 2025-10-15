@@ -1,3 +1,5 @@
+import Button from '@/common/components/Button';
+
 import { useState } from 'react';
 
 type TabKey = 'profile' | 'media' | 'links' | 'settings';
@@ -8,15 +10,19 @@ type InfoWindowProps = {
 }
 
 const InfoWindow = ({ chatThreadId, onClose }: InfoWindowProps) => {
-    const [activeTab, setActiveTab] = useState<TabKey>('profile');
+    const [activeTab,] = useState<TabKey>('profile');
 
     return (
         chatThreadId && (
             <div className="h-full bg-backgroundSidebar">
                 <div className="sticky top-0 z-10 bg-backgroundSidebar border-b border-gray-2 py-2.5">
                     <div className="px-4 py-3 flex items-center justify-between h-full">
-                        <h5 className="text-black font-bold text-xl">Contact Info</h5>
-                        <i onClick={onClose} className="fa-solid fa-xmark text-white text-sm cursor-pointer"></i>
+                        <h5 className="text-black font-bold text-xl w-full flex items-center justify-between">
+                            Contact Info
+                            <Button className="text-gray-1 hover:bg-red-1 hover:text-white flex items-center justify-center h-6 w-6 rounded-full" onClick={onClose}>
+                                <i className="fa-solid fa-xmark text-sm"></i>
+                            </Button>
+                        </h5>
                     </div>
                 </div>
 

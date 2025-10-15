@@ -1,22 +1,18 @@
-version: '3.8'
 services:
-  postgres:
-    image: postgres:15-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+  mongo:
+    image: mongo:latest
+    container_name: 'nest_mongo'
     volumes:
-      - db-data:/var/lib/postgresql/data
-    networks:
-      - app-network
-    # Add health check for postgres
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - mongodb_data_container:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    env_file:
+      - .env
+    environment:
+      - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+    ports:
+      - "27017:27017"
 
   backend:
     build:
@@ -26,21 +22,21 @@ services:
     env_file:
       - .env.backend
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      DATABASE_URL: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:27017/${MONGO_DATABASE}?authSource=admin
     ports:
       - "3000:3000"
     # Fix: Remove the incorrect volume mount and use correct path
     # volumes:
     #   - ./backend:/app  # This was wrong - should be ./packages/backend if needed
     depends_on:
-      postgres:
-        condition: service_healthy  # Wait for postgres to be healthy
+      mongo:
+        condition: service_started
     networks:
-      - app-network
+      - mongodb_network
 
 volumes:
-  db-data: {}
+  mongodb_data_container: {}
 
 networks:
-  app-network:
+  mongodb_network:
     driver: bridge

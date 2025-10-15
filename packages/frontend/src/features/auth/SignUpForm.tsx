@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { authApi } from "../../../api/auth";
+import { authApi } from "@/api/auth";
 
 function SignUpForm() {
     const [form, setForm] = useState({ username: "", email: "", password: "" });
@@ -24,7 +24,9 @@ function SignUpForm() {
                 password: form.password,
             });
             setSuccess("Đăng ký thành công!");
-        } catch (err: any) {
+        } catch (err: {
+            response?: { data?: { message?: string } };
+        }) {
             setError(err?.response?.data?.message || "Đăng ký thất bại");
         } finally {
             setLoading(false);
