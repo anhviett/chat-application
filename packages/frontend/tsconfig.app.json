@@ -29,41 +29,44 @@
       "@/*": [
         "src/*"
       ],
-      "@common/*": [
+      "@/common/*": [
         "src/common/*"
       ],
-      "@components/*": [
+      "@/components/*": [
         "src/common/components/*"
       ],
-      "@auth/*": [
+      "@/auth/*": [
         "src/features/auth/*"
       ],
-      "@hooks/*": [
+      "@/hooks/*": [
         "src/common/hooks/*"
       ],
-      "@features/*": [
+      "@/features/*": [
         "src/features/*"
       ],
-      "@utils/*": [
+      "@/utils/*": [
         "src/common/utils/*"
       ],
-      "@assets/*": [
+      "@/assets/*": [
         "src/assets/*"
       ],
-      "@pages/*": [
+      "@/pages/*": [
         "src/pages/*"
       ],
-      "@layouts/*": [
+      "@/layouts/*": [
         "src/layouts/*"
       ],
-      "@api/*": [
+      "@/api/*": [
         "src/api/*"
       ],
-      "@sockets/*": [
+      "@/sockets/*": [
         "src/sockets/*"
       ],
-      "@contexts/*": [
+      "@/contexts/*": [
         "src/contexts/*"
+      ],
+      "@/types/*": [
+        "src/types/*"
       ]
     }
   },

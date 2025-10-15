@@ -20,7 +20,9 @@ const RecentChat = () => {
                 </div>
                 <Swiper
                     spaceBetween={20}
-                    slidesPerView={4}
+                    slidesPerView={'auto'}
+                    freeMode={true}
+                    watchSlidesProgress={true}
                     className='online-contact-slider'
                 >
                     {slideData.map((slide) => (

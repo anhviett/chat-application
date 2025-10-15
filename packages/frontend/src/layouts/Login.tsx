@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { authApi } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext'
+import { UserType } from '@/types/user-type';
+import { LoginInputs } from '@/types/login-input';
 
 function isTokenValid(token: string | null): boolean {
     if (!token) return false;
@@ -14,7 +17,8 @@ function isTokenValid(token: string | null): boolean {
 }
 
 const Login = () => {
-    const [inputs, setInputs] = useState({});
+    const { login } = useAuth();
+    const [inputs, setInputs] = useState<LoginInputs>({});
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
 
@@ -40,10 +44,16 @@ const Login = () => {
         // Perform login logic here
         try {
             const data = await authApi.login(inputs);
-            localStorage.setItem('access_token', data.access_token);
+            const user: UserType = data.user;
+            
+            // Sử dụng AuthContext để lưu thông tin đăng nhập
+            login(data.accessToken, data.refreshToken, user);
+
+            // Redirect to home
             navigate('/');
         } catch (error) {
             console.log("🚀 ~ handleSubmit ~ error:", error)
+            // TODO: Show error message to user
         }
     }
 
@@ -134,6 +144,15 @@ const Login = () => {
                                         Forgot Password?
                                     </a>
                                 </div>
+                                <input
+                                    type="hidden"
+                                    name="expiresInMins"
+                                    id="expiresInMins"
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-md h-9 block w-full pl-6"
+                                    value={inputs.expiresInMins || 24*3600}
+                                    onChange={handleChange}
+                                    required
+                                />
                                 <button
                                     type="submit"
                                     className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -152,7 +171,6 @@ const Login = () => {
                             </form>
                         </div>
                     </div>
-                    <div className=""></div>
                 </div>
             </div>
         </>

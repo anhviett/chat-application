@@ -8,8 +8,8 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
     icon?: React.ReactNode;
 }
 
-const Button: React.FC<ButtonProps> = ({ children, variant = 'primary', size = 'medium', fullWidth = false, loading = false, icon, disabled, className = '', ...props }) => {
-    const baseClasses = "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2";
+const Button: React.FC<ButtonProps> = ({ children, variant, size, fullWidth = false, loading = false, icon, disabled, className = '', ...props }) => {
+    const baseClasses = "gap-2 font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2";
 
     const variantClasses = {
         primary: "bg-purple-1 text-white hover:bg-purple-1-hover focus:ring-blue-500 disabled:bg-blue-300",
@@ -26,8 +26,8 @@ const Button: React.FC<ButtonProps> = ({ children, variant = 'primary', size = '
 
     const classes = [
         baseClasses,
-        variantClasses[variant],
-        sizeClasses[size],
+        variant ? variantClasses[variant] : '',
+        size ? sizeClasses[size] : '',
         fullWidth && "w-full",
         (disabled || loading) && "cursor-not-allowed opacity-60",
         className
