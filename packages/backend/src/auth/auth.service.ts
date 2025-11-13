@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateAuthDto, LoginAuthDto } from './dto/login-auth.dto';
 import { UpdateAuthDto } from './dto/register-auth.dto';
 import { UsersService } from 'src/users/users.service';
-import { JwtService } from '@nestjs/jwt/dist/jwt.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -35,9 +35,5 @@ export class AuthService {
 
   remove(id: number) {
     return `This action removes a #${id} auth`;
-  }
-
-  login(createAuthDto: CreateAuthDto) {
-    return `This action logs in a user with email ${createAuthDto.email}`;
   }
 }

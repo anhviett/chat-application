@@ -24,7 +24,7 @@ services:
     environment:
       DATABASE_URL: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:27017/${MONGO_DATABASE}?authSource=admin
     ports:
-      - "3000:3000"
+      - "3001:3001"
     # Fix: Remove the incorrect volume mount and use correct path
     # volumes:
     #   - ./backend:/app  # This was wrong - should be ./packages/backend if needed

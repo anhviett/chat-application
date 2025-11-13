@@ -13,3 +13,5 @@ export class LoginAuthDto {
     @MinLength(6)
     password: string;
 }
+
+export class CreateAuthDto extends LoginAuthDto {}
