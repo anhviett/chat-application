@@ -35,10 +35,8 @@ export class User {
     password: string;
 
     @Prop({
-        required: true,
         select: false,
     })
-    password_key: string;
 
     @Prop()
     about: string;

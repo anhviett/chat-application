@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { authApi } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext'
 import { UserType } from '@/types/user-type';
 import { LoginInputs } from '@/types/login-input';
+import Button from '@/common/components/Button';
+import InputCustom from '@/common/components/InputCustom';
 
 function isTokenValid(token: string | null): boolean {
     if (!token) return false;
@@ -18,7 +19,7 @@ function isTokenValid(token: string | null): boolean {
 
 const Login = () => {
     const { login } = useAuth();
-    const [inputs, setInputs] = useState<LoginInputs>({});
+    const [inputs, setInputs] = useState<LoginInputs>({ email: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
 
@@ -27,7 +28,7 @@ const Login = () => {
     }
 
     useEffect(() => {
-        const token = localStorage.getItem('access_token');
+        const token = localStorage.getItem('accessToken');
         if (isTokenValid(token)) {
             navigate('/');
         }
@@ -41,20 +42,27 @@ const Login = () => {
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        // Perform login logic here
-        try {
-            const data = await authApi.login(inputs);
-            const user: UserType = data.user;
-            
-            // Sử dụng AuthContext để lưu thông tin đăng nhập
-            login(data.accessToken, data.refreshToken, user);
+        
+        // Mock user data for successful login
+        const mockUser: UserType = {
+            id: 1,
+            email: inputs.email || 'user@example.com',
+            username: inputs.email?.split('@')[0] || 'user',
+            firstName: 'Test',
+            lastName: 'User',
+            image: 'https://api.example.com/avatar.jpg',
+        };
 
-            // Redirect to home
-            navigate('/');
-        } catch (error) {
-            console.log("🚀 ~ handleSubmit ~ error:", error)
-            // TODO: Show error message to user
-        }
+        // Mock tokens with proper expiration (24 hours from now)
+        const expirationTime = Math.floor(Date.now() / 1000) + 24 * 60 * 60; // 24 hours in seconds
+        const mockAccessToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ id: 1, name: 'test', exp: expirationTime }))}.mock-signature`;
+        const mockRefreshToken = 'mock-refresh-token';
+
+        // Sử dụng AuthContext để lưu thông tin đăng nhập
+        login(mockAccessToken, mockRefreshToken, mockUser);
+
+        // Redirect to dashboard
+        navigate('/');
     }
 
     return (
@@ -77,22 +85,14 @@ const Login = () => {
                                 </div>
                                 <div>
                                     <label
-                                        htmlFor="username"
+                                        htmlFor="email"
                                         className="text-sm font-medium text-gray-900 block mb-2"
                                     >
-                                        User Name
+                                        Email
                                     </label>
                                     <div className="relative">
                                         <i className="fa-solid fa-user text-gray-500 text-sm absolute top-0 left-0 p-2"></i>
-                                        <input
-                                            type="text"
-                                            name="username"
-                                            id="username"
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-md h-9 block w-full pl-6"
-                                            value={inputs.username || ""}
-                                            onChange={handleChange}
-                                            required
-                                        />
+                                        <InputCustom type="email" name="email" value={inputs.email || ""} onChange={handleChange} placeholder="Enter your email" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-md h-9 block w-full pl-6" required />
                                     </div>
                                 </div>
                                 <div>
@@ -103,30 +103,16 @@ const Login = () => {
                                         Your password
                                     </label>
                                     <div className='relative'>
-                                        <i 
-                                        onClick={togglePassword}
-                                        className="fa-solid fa-eye cursor-pointer text-gray-500 text-sm absolute top-0 left-0 p-2"></i>
-                                        <input
-                                            type={showPassword ? 'text' : 'password'}
-                                            name="password"
-                                            id="password"
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-md h-9 block w-full pl-6"
-                                            value={inputs.password || ""}
-                                            onChange={handleChange}
-                                            required
-                                        />
+                                        <i
+                                            onClick={togglePassword}
+                                            className="fa-solid fa-eye cursor-pointer text-gray-500 text-sm absolute top-0 left-0 p-2"></i>
+                                        <InputCustom type={showPassword ? 'text' : 'password'} name="password" value={inputs.password || ""} onChange={handleChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-md h-9 block w-full pl-6" required />
                                     </div>
                                 </div>
                                 <div className="flex items-start">
                                     <div className="flex items-start">
                                         <div className="flex items-center h-5">
-                                            <input
-                                                id="remember"
-                                                aria-describedby="remember"
-                                                type="checkbox"
-                                                className="bg-gray-50 border border-gray-300 size-4 rounded-md"
-                                                required
-                                            />
+                                            <InputCustom type='checkbox' id="remember" className='bg-gray-50 border border-gray-300 size-4 rounded-md' />
                                         </div>
                                         <div className="text-sm ml-3">
                                             <label
@@ -144,21 +130,16 @@ const Login = () => {
                                         Forgot Password?
                                     </a>
                                 </div>
-                                <input
+                                {/* <input
                                     type="hidden"
                                     name="expiresInMins"
                                     id="expiresInMins"
                                     className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-md h-9 block w-full pl-6"
-                                    value={inputs.expiresInMins || 24*3600}
+                                    value={inputs.expiresInMins || 24 * 3600}
                                     onChange={handleChange}
                                     required
-                                />
-                                <button
-                                    type="submit"
-                                    className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                                >
-                                    Login
-                                </button>
+                                /> */}
+                                <Button variant="primary" size="medium" fullWidth type='submit'>Login</Button>
                                 <div className="text-sm font-medium text-gray-500">
                                     Not registered?{" "}
                                     <a
