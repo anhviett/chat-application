@@ -1,3 +1,4 @@
+import * as dotenv from 'dotenv';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
@@ -7,9 +8,20 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { SocketGateway } from './socket/socket.gateway';
 
+dotenv.config();
+
+const mongoUri =
+  process.env.DATABASE_URL ||
+  `${process.env.MONGO_URI}/${process.env.MONGO_DATABASE}`;
+
+console.log(
+  'MongoDB connected:',
+  mongoUri.replace(/:[^@]*@/, ':****@').substring(0, 80) + '...'
+);
+
 @Module({
   imports: [
-    MongooseModule.forRoot(process.env.MONGO_URI || 'mongodb://localhost:27017/chat'),
+    MongooseModule.forRoot(mongoUri),
     ChatModule,
     AuthModule,
     UsersModule,
