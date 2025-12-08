@@ -14,3 +14,51 @@
     margin-top: 4px;
   }
 }
+
+/* Custom Tailwind theme - Tailwind v4 way */
+@theme {
+  /* Custom colors - Project specific */
+  --color-title: #181818;
+  --color-description: #a0a5a8;
+  --color-gray-1: #ecf0f3;
+  --color-primary: #01AD52;
+  --color-primary-hover: #008346;
+  
+  /* Custom gradients */
+  --gradient-header: linear-gradient(90deg, #00B74F 0%, #017196 100%);
+  
+  /* Custom spacing (if needed beyond default) */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+  
+  /* Custom fonts */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Fira Code', 'Courier New', monospace;
+  
+  /* Custom border radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-full: 9999px;
+  
+  /* Custom breakpoints (if needed) */
+  --breakpoint-xs: 475px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
+
+/* Custom utilities (optional) */
+@utility tab-highlight {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Global styles (optional) */
+.bg-gradient-header {
+  background: var(--gradient-header);
+}

@@ -1,6 +1,6 @@
 import { useRef, } from "react";
 import { UserType } from "@/types/user-type";
-import { useUserList } from "@/common/hooks/useUserList";
+import { useUserList } from "@/hooks/useUserList";
 
 const groupUsersByLetter = (users: UserType[]) => {
     const grouped: { [key: string]: UserType[] } = {};
@@ -53,7 +53,7 @@ export default function ListUser() {
         );
     }    return (
         <div className="relative flex h-[80vh] border rounded-lg shadow-md bg-white overflow-hidden">
-            <div className="flex-1 overflow-y-auto px-4 py-2">
+            <div className="flex-1 overflow-y-auto px-4 pb-2">
                 {letters.map((letter) => (
                     <div key={letter} ref={(el) => { sectionRefs.current[letter] = el; }}>
                         <div className="sticky top-0 bg-white text-blue-600 font-bold text-lg py-1 text-nowrap">
@@ -72,7 +72,7 @@ export default function ListUser() {
                                                 <span className="text-white">{user.firstName?.[0]}{user.lastName?.[0]}</span>
                                             )}
                                         </div>
-                                        <div>
+                                        <div className="overflow-hidden whitespace-nowrap text-ellipsis">
                                             <div className="font-medium">
                                                 {user.firstName} {user.lastName}
                                             </div>

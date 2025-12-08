@@ -1,4 +1,4 @@
-import Button from "@/common/components/Button";
+import Button from "@/components/Button";
 interface DefaultChatProps {
     className?: string;
 }

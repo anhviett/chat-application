@@ -1,8 +1,8 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { LoadingPage } from '@/common/components/LoadingSpinner';
-import { isTokenValid, isTokenExpiringSoon } from '@/common/utils/tokenUtils';
+import { LoadingPage } from '@/components/LoadingSpinner';
+import { isTokenValid, isTokenExpiringSoon } from '@/utils/tokenUtils';
 
 interface PrivateRouteProps {
     children: ReactNode;

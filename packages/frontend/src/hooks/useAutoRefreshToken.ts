@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { getTokenTimeRemaining, isTokenValid } from '@/common/utils/tokenUtils';
+import { getTokenTimeRemaining, isTokenValid } from '@/utils/tokenUtils';
 
 /**
  * Hook tự động refresh token khi sắp hết hạn

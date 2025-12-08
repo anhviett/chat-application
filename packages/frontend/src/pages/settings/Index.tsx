@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import AccordionItem from '@/common/components/AccordionItem';
+import AccordionItem from '@/components/AccordionItem';
 
 const Setting = () => {
     const [openItem, setOpenItem] = useState<number | null>(1);

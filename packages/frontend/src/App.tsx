@@ -1,7 +1,5 @@
-import PrivateRoute from '@/common/components/PrivateRoute';
-import ErrorBoundary from '@/common/components/ErrorBoundary';
-import Login from '@/layouts/Login';
-import Logout from '@/layouts/Logout';
+import PrivateRoute from '@/components/PrivateRoute';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import Chat from '@/pages/chat/Index';
 import Contact from '@/pages/contacts/Index';
 import Setting from '@/pages/settings/Index';
@@ -14,7 +12,7 @@ import Conversation from "@/features/chat/components/Conversation";
 import ChatDefault from "@/features/chat/components/ChatDefault";
 import { TypingProvider } from '@/contexts/TypingContext';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { useAutoRefreshToken } from '@/common/hooks/useAutoRefreshToken';
+import { useAutoRefreshToken } from '@/hooks/useAutoRefreshToken';
 import { useState, useEffect } from 'react';
 import { socket } from "@/sockets/index";
 import {
@@ -24,6 +22,8 @@ import {
   Outlet,
   useLocation
 } from 'react-router-dom';
+import AuthLayout from './layouts/AuthLayout';
+import AuthPage from './features/Index';
 
 // Layout Component với 3 cột cố định
 const MainLayout = () => {
@@ -126,6 +126,11 @@ function App() {
       <AuthProvider>
         <Router>
           <Routes>
+            {/* Routes không có Sidebar (Login) */}
+            <Route path="/auth" element={<AuthLayout />} >
+              <Route path="login" element={<AuthPage />} />
+            </Route>
+
             {/* Routes có Sidebar + Main Content (3 cột) - Bảo vệ bởi PrivateRoute */}
             <Route element={<PrivateRoute><MainLayout /></PrivateRoute>}>
               <Route path="/" element={<Chat />} />
@@ -136,10 +141,6 @@ function App() {
               <Route path="/status" element={<Status />} />
               <Route path="/setting" element={<Setting />} />
             </Route>
-
-            {/* Routes không có Sidebar (Login) */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/logout" element={<Logout />} />
           </Routes>
         </Router>
       </AuthProvider>

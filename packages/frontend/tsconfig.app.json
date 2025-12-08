@@ -29,23 +29,20 @@
       "@/*": [
         "src/*"
       ],
-      "@/common/*": [
-        "src/common/*"
-      ],
       "@/components/*": [
-        "src/common/components/*"
+        "src/components/*"
       ],
       "@/auth/*": [
         "src/features/auth/*"
       ],
       "@/hooks/*": [
-        "src/common/hooks/*"
+        "src/hooks/*"
       ],
       "@/features/*": [
         "src/features/*"
       ],
       "@/utils/*": [
-        "src/common/utils/*"
+        "src/utils/*"
       ],
       "@/assets/*": [
         "src/assets/*"
@@ -67,6 +64,9 @@
       ],
       "@/types/*": [
         "src/types/*"
+      ],
+      "@/services/*": [
+        "src/services/*"
       ]
     }
   },
