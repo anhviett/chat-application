@@ -28,8 +28,8 @@ const RecentChat = () => {
                     {slideData.map((slide) => (
                         <SwiperSlide key={slide.id} style={{ width: 'auto' }}>
                             <div className="flex flex-col">
-                                <div className="text-center w-16 h-16">
-                                    <img src={slide.avatar} alt={slide.name} className="w-12 h-12 rounded-full mx-auto" />
+                                <div className="text-center size-12 relative before:content-[''] before:absolute before:bg-active before:size-3 before:rounded-full before:right-0 before:bottom-0 before:border-2 before:border-white">
+                                    <img src={slide.avatar} alt={slide.name} className="rounded-full mx-auto" />
                                 </div>
                                 <p className="text-sm text-gray-1 mt-2">{slide.name}</p>
                             </div>

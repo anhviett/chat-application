@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Body,
   Param,
   Query,
@@ -10,38 +11,94 @@ import {
   Delete,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
-import { CreateConversationDto } from './dto/chat.dto';
+import {
+  CreateConversationDto,
+  UpdateConversationDto,
+  AddParticipantsDto,
+  SendMessageDto,
+  UpdateMessageDto,
+  CreateMessageStatusDto,
+  UpdateMessageStatusDto,
+  CreateUserContactDto,
+  CreateNotificationDto,
+  MarkNotificationAsReadDto,
+  CreateBlockedUserDto,
+  CreateGroupSettingDto,
+  UpdateGroupSettingDto,
+  CreateParticipantDto,
+} from './dto/chat.dto';
 
-// Create a simple JWT guard for REST endpoints
-// You should import from your auth module instead
 @Controller('chats')
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
+  // ============ CONVERSATION ENDPOINTS ============
+
   @Post('conversations')
-  // @UseGuards(JwtAuthGuard) // Add your JWT auth guard
   async createConversation(@Request() req, @Body() dto: CreateConversationDto) {
-    // For now, hardcode userId - replace with req.user.id from JWT guard
-    const userId = req.user?.id || 'temp-user-id';
+    const userId = req.user?.id || '6964c526d823f232a21daebb';
     return this.chatService.createConversation(userId, dto);
   }
 
   @Get('conversations')
-  // @UseGuards(JwtAuthGuard)
   async getUserConversations(@Request() req) {
     const userId = req.user?.id || 'temp-user-id';
     return this.chatService.getUserConversations(userId);
   }
 
   @Get('conversations/:id')
-  // @UseGuards(JwtAuthGuard)
   async getConversation(@Request() req, @Param('id') id: string) {
     const userId = req.user?.id || 'temp-user-id';
     return this.chatService.getConversation(id, userId);
   }
 
+  // @Put('conversations/:id')
+  // async updateConversation(
+  //   @Request() req,
+  //   @Param('id') conversationId: string,
+  //   @Body() dto: UpdateConversationDto,
+  // ) {
+  //   const userId = req.user?.id || 'temp-user-id';
+  //   return this.chatService.updateConversation(conversationId, userId, dto);
+  // }
+
+  @Post('conversations/:id/read')
+  async markConversationAsRead(@Request() req, @Param('id') conversationId: string) {
+    const userId = req.user?.id || 'temp-user-id';
+    return this.chatService.markConversationAsRead(conversationId, userId);
+  }
+
+  @Post('conversations/:id/leave')
+  async leaveConversation(@Request() req, @Param('id') conversationId: string) {
+    const userId = req.user?.id || 'temp-user-id';
+    return this.chatService.leaveConversation(conversationId, userId);
+  }
+
+  // ============ PARTICIPANTS ENDPOINTS ============
+
+  @Post('conversations/:id/participants')
+  async addParticipants(
+    @Request() req,
+    @Param('id') conversationId: string,
+    @Body() dto: AddParticipantsDto,
+  ) {
+    const userId = req.user?.id || 'temp-user-id';
+    return this.chatService.addParticipants(conversationId, userId, dto.participants);
+  }
+
+  @Delete('conversations/:id/participants/:userId')
+  async removeParticipant(
+    @Request() req,
+    @Param('id') conversationId: string,
+    @Param('userId') participantId: string,
+  ) {
+    const userId = req.user?.id || 'temp-user-id';
+    return this.chatService.removeParticipant(conversationId, userId, participantId);
+  }
+
+  // ============ MESSAGE ENDPOINTS ============
+
   @Get('conversations/:id/messages')
-  // @UseGuards(JwtAuthGuard)
   async getMessages(
     @Request() req,
     @Param('id') conversationId: string,
@@ -57,46 +114,144 @@ export class ChatController {
     );
   }
 
-  @Post('conversations/:id/read')
-  // @UseGuards(JwtAuthGuard)
-  async markConversationAsRead(@Request() req, @Param('id') conversationId: string) {
+  @Post('messages')
+  async sendMessage(@Request() req, @Body() dto: SendMessageDto) {
     const userId = req.user?.id || 'temp-user-id';
-    return this.chatService.markConversationAsRead(conversationId, userId);
+    return this.chatService.sendMessage(userId, dto);
   }
 
-  @Delete('messages/:id')
-  // @UseGuards(JwtAuthGuard)
-  async deleteMessage(@Request() req, @Param('id') messageId: string) {
-    const userId = req.user?.id || 'temp-user-id';
-    return this.chatService.deleteMessage(messageId, userId);
-  }
-
-  @Post('conversations/:id/participants')
-  // @UseGuards(JwtAuthGuard)
-  async addParticipants(
+  @Put('messages/:id')
+  async updateMessage(
     @Request() req,
-    @Param('id') conversationId: string,
-    @Body('participants') participants: string[],
+    @Param('id') messageId: string,
+    @Body() dto: UpdateMessageDto,
   ) {
     const userId = req.user?.id || 'temp-user-id';
-    return this.chatService.addParticipants(conversationId, userId, participants);
+    // return this.chatService.updateMessage(messageId, userId, dto);
   }
 
-  @Delete('conversations/:id/participants/:userId')
-  // @UseGuards(JwtAuthGuard)
-  async removeParticipant(
-    @Request() req,
-    @Param('id') conversationId: string,
-    @Param('userId') participantId: string,
-  ) {
-    const userId = req.user?.id || 'temp-user-id';
-    return this.chatService.removeParticipant(conversationId, userId, participantId);
-  }
+  // @Delete('messages/:id')
+  // async deleteMessage(@Request() req, @Param('id') messageId: string) {
+  //   const userId = req.user?.id || 'temp-user-id';
+  //   return this.chatService.deleteMessage(messageId, userId);
+  // }
 
-  @Post('conversations/:id/leave')
-  // @UseGuards(JwtAuthGuard)
-  async leaveConversation(@Request() req, @Param('id') conversationId: string) {
-    const userId = req.user?.id || 'temp-user-id';
-    return this.chatService.leaveConversation(conversationId, userId);
-  }
+  // // ============ MESSAGE STATUS ENDPOINTS ============
+
+  // @Post('message-status')
+  // async createMessageStatus(@Request() req, @Body() dto: CreateMessageStatusDto) {
+  //   const userId = req.user?.id || 'temp-user-id';
+  //   return this.chatService.createMessageStatus(userId, dto);
+  // }
+
+  // @Put('message-status/:id')
+  // async updateMessageStatus(
+  //   @Request() req,
+  //   @Param('id') messageStatusId: string,
+  //   @Body() dto: UpdateMessageStatusDto,
+  // ) {
+  //   const userId = req.user?.id || 'temp-user-id';
+  //   return this.chatService.updateMessageStatus(messageStatusId, userId, dto);
+  // }
+
+  // // ============ USER CONTACTS ENDPOINTS ============
+
+  // @Get('contacts')
+  // async getUserContacts(@Request() req) {
+  //   const userId = req.user?.id || 'temp-user-id';
+  //   return this.chatService.getUserContacts(userId);
+  // }
+
+  // @Post('contacts')
+  // async addUserContact(@Request() req, @Body() dto: CreateUserContactDto) {
+  //   const userId = req.user?.id || 'temp-user-id';
+  //   return this.chatService.addUserContact(userId, dto.friendId);
+  // }
+
+  // @Delete('contacts/:friendId')
+  // async removeUserContact(@Request() req, @Param('friendId') friendId: string) {
+  //   const userId = req.user?.id || 'temp-user-id';
+  //   return this.chatService.removeUserContact(userId, friendId);
+  // }
+
+  // // ============ BLOCKED USERS ENDPOINTS ============
+
+  // @Get('blocked')
+  // async getBlockedUsers(@Request() req) {
+  //   const userId = req.user?.id || 'temp-user-id';
+  //   return this.chatService.getBlockedUsers(userId);
+  // }
+
+  // @Post('blocked')
+  // async blockUser(@Request() req, @Body() dto: CreateBlockedUserDto) {
+  //   const userId = req.user?.id || 'temp-user-id';
+  //   return this.chatService.blockUser(userId, dto.blockedUserId);
+  // }
+
+  // @Delete('blocked/:blockedUserId')
+  // async unblockUser(@Request() req, @Param('blockedUserId') blockedUserId: string) {
+  //   const userId = req.user?.id || 'temp-user-id';
+  //   return this.chatService.unblockUser(userId, blockedUserId);
+  // }
+
+  // // ============ NOTIFICATIONS ENDPOINTS ============
+
+  // @Get('notifications')
+  // async getNotifications(@Request() req, @Query('limit') limit?: string) {
+  //   const userId = req.user?.id || 'temp-user-id';
+  //   return this.chatService.getNotifications(userId, limit ? parseInt(limit) : 50);
+  // }
+
+  // @Put('notifications/:id')
+  // async markNotificationAsRead(
+  //   @Request() req,
+  //   @Param('id') notificationId: string,
+  //   @Body() dto: MarkNotificationAsReadDto,
+  // ) {
+  //   const userId = req.user?.id || 'temp-user-id';
+  //   return this.chatService.markNotificationAsRead(notificationId, userId, dto);
+  // }
+
+  // // ============ GROUP SETTINGS ENDPOINTS ============
+
+  // @Get('conversations/:conversationId/settings')
+  // async getGroupSettings(@Param('conversationId') conversationId: string) {
+  //   return this.chatService.getGroupSettings(conversationId);
+  // }
+
+  // @Post('conversations/:conversationId/settings')
+  // async createGroupSetting(
+  //   @Request() req,
+  //   @Param('conversationId') conversationId: string,
+  //   @Body() dto: CreateGroupSettingDto,
+  // ) {
+  //   const userId = req.user?.id || 'temp-user-id';
+  //   return this.chatService.createGroupSetting(conversationId, userId, dto);
+  // }
+
+  // @Put('conversations/:conversationId/settings/:settingName')
+  // async updateGroupSetting(
+  //   @Request() req,
+  //   @Param('conversationId') conversationId: string,
+  //   @Param('settingName') settingName: string,
+  //   @Body() dto: UpdateGroupSettingDto,
+  // ) {
+  //   const userId = req.user?.id || 'temp-user-id';
+  //   return this.chatService.updateGroupSetting(
+  //     conversationId,
+  //     settingName,
+  //     userId,
+  //     dto,
+  //   );
+  // }
+
+  // @Delete('conversations/:conversationId/settings/:settingName')
+  // async deleteGroupSetting(
+  //   @Request() req,
+  //   @Param('conversationId') conversationId: string,
+  //   @Param('settingName') settingName: string,
+  // ) {
+  //   const userId = req.user?.id || 'temp-user-id';
+  //   return this.chatService.deleteGroupSetting(conversationId, settingName, userId);
+  // }
 }

@@ -11,7 +11,7 @@ const Profile = () => {
                 <ul className="space-y-3 text-sm text-gray-1">
                     <li>
                         <span className="font-semibold text-black">Email:</span>
-                        <span className="ml-2">edward.lietz@example.com</span>
+                        <span className="ml-2 break-all">edward.lietz@example.com</span>
                     </li>
                 </ul>
             </div>

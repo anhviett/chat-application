@@ -43,8 +43,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             throw new Error('No refresh token available');
         }
 
+        // Handle mock refresh token
+        if (refreshToken === 'mock-refresh-token') {
+            const expirationTime = Math.floor(Date.now() / 1000) + 24 * 60 * 60; // 24 hours in seconds
+            const newMockToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ id: 1, name: 'test', exp: expirationTime }))}.mock-signature`;
+            localStorage.setItem('accessToken', newMockToken);
+            setAccessToken(newMockToken);
+            return newMockToken;
+        }
+
         try {
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+            const apiUrl = import.meta.env.VITE_BACKEND_URL;
             const response = await fetch(`${apiUrl}/api/v1/auth/refresh-token`, {
                 method: 'POST',
                 headers: {

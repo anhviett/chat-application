@@ -193,7 +193,6 @@ class DatabaseSeeder {
         type: 'direct',
         participants: [users[0]._id, users[1]._id],
         createdBy: users[0]._id,
-        lastMessageAt: new Date(),
         participantMetadata: {
           [users[0]._id.toString()]: {
             unreadCount: 0,
@@ -215,7 +214,6 @@ class DatabaseSeeder {
         createdBy: users[0]._id,
         description: 'Group for development team discussions',
         avatar: 'https://example.com/avatar.jpg',
-        lastMessageAt: new Date(),
         participantMetadata: {
           [users[0]._id.toString()]: {
             unreadCount: 0,

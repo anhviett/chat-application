@@ -29,12 +29,6 @@ export class Conversation {
   @Prop()
   description?: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'Message' })
-  lastMessage?: Types.ObjectId;
-
-  @Prop()
-  lastMessageAt?: Date;
-
   @Prop({
     type: Map,
     of: {
@@ -72,4 +66,3 @@ export const ConversationSchema = SchemaFactory.createForClass(Conversation);
 // Indexes for performance
 ConversationSchema.index({ participants: 1 });
 ConversationSchema.index({ type: 1 });
-ConversationSchema.index({ lastMessageAt: -1 });

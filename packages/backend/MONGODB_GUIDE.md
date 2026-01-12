@@ -159,8 +159,6 @@ load('/path/to/mongodb-setup.js')
   name: String,                    // Tên (cho group/channel)
   avatar: String,                  // Avatar URL
   description: String,             // Mô tả
-  lastMessage: ObjectId,           // Ref to message
-  lastMessageAt: Date,             // Thời gian tin cuối
   participantMetadata: {           // Metadata cho mỗi user
     "userId": {
       unreadCount: Number,

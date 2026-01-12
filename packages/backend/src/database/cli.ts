@@ -1,9 +1,16 @@
 import * as dotenv from 'dotenv';
-import { CreateUsersCollectionMigration } from './migrations/1_create_users_collection.migration';
-import { CreateInterestsCollectionMigration } from './migrations/2_create_interests_collection.migration';
-import { CreateConversationsCollectionMigration } from './migrations/3_create_conversations_collection.migration';
-import { CreateMessagesCollectionMigration } from './migrations/4_create_messages_collection.migration';
 import { MongoClient, Db } from 'mongodb';
+import { Migration, } from './migrations/migration.interface';
+import { CreateUsersCollectionMigration } from './migrations/1_create_users_collection.migration';
+import { CreateConversationsCollectionMigration } from './migrations/2_create_conversations_collection.migration';
+import { CreateMessagesCollectionMigration } from './migrations/3_create_messages_collection.migration';
+import { CreateMessageStatusCollectionMigration } from './migrations/4_create_message_status_collection.migration';
+import { CreateAttachmentsCollectionMigration } from './migrations/5_create_attachments_collection.migration';
+import { CreateNotificationsCollectionMigration } from './migrations/6_create_notifications_collection.migration';
+import { CreateBlockedUsersCollectionMigration } from './migrations/7_create_blocked_users_collection.migration';
+import { CreateGroupSettingsCollectionMigration } from './migrations/8_create_group_settings_collection.migration';
+import { CreateParticipantsCollectionMigration } from './migrations/9_create_participants_collection.migration';
+import { CreateUserContactsCollectionMigration } from './migrations/10_create_user_contacts_collection.migration';
 
 // Load environment variables
 dotenv.config();
@@ -21,12 +28,18 @@ class MigrationRunner {
   private client: MongoClient;
   private db: Db;
 
-  private migrations = {
+  private migrations: { [key: string]: Migration } = {
     '1_create_users_collection': new CreateUsersCollectionMigration(),
-    '2_create_interests_collection': new CreateInterestsCollectionMigration(),
-    '3_create_conversations_collection':
+    '2_create_conversations_collection':
       new CreateConversationsCollectionMigration(),
-    '4_create_messages_collection': new CreateMessagesCollectionMigration(),
+    '3_create_messages_collection': new CreateMessagesCollectionMigration(),
+    '4_create_message_status_collection': new CreateMessageStatusCollectionMigration(),
+    '5_create_attachments_collection': new CreateAttachmentsCollectionMigration(),
+    '6_create_notifications_collection': new CreateNotificationsCollectionMigration(),
+    '7_create_blocked_users_collection': new CreateBlockedUsersCollectionMigration(),
+    '8_create_group_settings_collection': new CreateGroupSettingsCollectionMigration(),
+    '9_create_participants_collection': new CreateParticipantsCollectionMigration(),
+    '10_create_user_contacts_collection': new CreateUserContactsCollectionMigration(),
   };
 
   constructor() {

@@ -19,6 +19,7 @@ const config: Config = {
         'purple-1-hover': '#582af5',
         'purple-2': '#f1edfe',
         'red-1': '#fd3a55',
+        'active': '#0cc68c',
       },
       fontFamily: {
         'archivo': ['var(--font-archivo)']

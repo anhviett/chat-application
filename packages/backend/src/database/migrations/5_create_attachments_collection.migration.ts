@@ -1,57 +1,36 @@
 import { Db } from 'mongodb';
 import { Migration } from './migration.interface';
 
-export class CreateMessagesCollectionMigration implements Migration {
+export class CreateAttachmentsCollectionMigration implements Migration {
   async up(db: Db): Promise<void> {
-    console.log('⬆️  Running: Create messages collection');
+    console.log('⬆️  Running: Create attachments collection');
 
-    await db.createCollection('messages', {
+    await db.createCollection('attachments', {
       validator: {
         $jsonSchema: {
           bsonType: 'object',
-          required: ['sender', 'conversationId', 'content'],
+          required: ['sender', 'conversationId'],
           properties: {
             _id: { bsonType: 'objectId' },
-            sender: {
-              bsonType: 'objectId',
-              description: 'User ID of message sender',
+            messageId: {
+              bsonType: 'int',
+              description: 'ID of the message this attachment belongs to',
             },
-            conversationId: {
-              bsonType: 'objectId',
-              description: 'Reference to the conversation',
-            },
-            content: {
+            fileUrl: {
               bsonType: 'string',
-              description: 'Message content/text',
+              description: 'URL of the attachment file',
             },
-            type: {
-              enum: ['text', 'image', 'file', 'audio', 'video'],
-              description: 'Type of message content',
+            fileType: {
+              bsonType: 'string',
+              description: 'Type of the attachment file',
             },
-            status: {
-              enum: ['sent', 'delivered', 'read'],
-              description: 'Delivery and read status',
+            fileSize: {
+              bsonType: 'string',
+              description: 'Size of the attachment file',
             },
-            readBy: {
-              bsonType: 'array',
-              description: 'Array of users who have read the message',
-            },
-            replyTo: {
-              bsonType: 'objectId',
-              description: 'Reference to replied message (if any)',
-            },
-            attachments: {
-              bsonType: 'array',
-              items: { bsonType: 'string' },
-              description: 'Array of attachment file URLs',
-            },
-            isDeleted: {
-              bsonType: 'bool',
-              description: 'Whether message is deleted',
-            },
-            deletedAt: {
+            uploadedAt: {
               bsonType: 'date',
-              description: 'Timestamp when message was deleted',
+              description: 'Timestamp when the attachment was uploaded',
             },
             createdAt: { bsonType: 'date' },
             updatedAt: { bsonType: 'date' },

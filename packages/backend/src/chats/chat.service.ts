@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Message, MessageStatus } from './schemas/message.schema';
+import { Message, MessageStatus, MessageType } from './schemas/message.schema';
 import { Conversation, ConversationType } from './schemas/conversation.schema';
 import { SendMessageDto, CreateConversationDto } from './dto/chat.dto';
 
@@ -14,11 +14,16 @@ export class ChatService {
 
   // Create a new conversation
   async createConversation(userId: string, dto: CreateConversationDto) {
+    console.log('Creating conversation with DTO:', dto);
+    const userObjectId = new Types.ObjectId(userId);
+    const participantObjectIds = dto.participants.map(p => new Types.ObjectId(p));
+    
     // For direct conversations, check if one already exists
     if (dto.type === ConversationType.DIRECT) {
+      const allParticipants = [userObjectId, ...participantObjectIds];
       const existingConversation = await this.conversationModel.findOne({
         type: ConversationType.DIRECT,
-        participants: { $all: [userId, ...dto.participants], $size: 2 },
+        participants: { $all: allParticipants, $size: 2 },
       });
 
       if (existingConversation) {
@@ -28,11 +33,22 @@ export class ChatService {
 
     const conversation = new this.conversationModel({
       type: dto.type,
-      participants: [userId, ...dto.participants],
-      createdBy: userId,
+      participants: [userObjectId, ...participantObjectIds],
+      createdBy: userObjectId,
       name: dto.name,
+      avatar: dto.avatar,
       description: dto.description,
-      admins: dto.type === ConversationType.GROUP ? [userId] : [],
+      participantMetadata: new Map(
+        [userId, ...dto.participants].map(p => [
+          p,
+          {
+            unreadCount: 0,
+            lastReadAt: new Date(),
+          },
+        ])
+      ),
+      admins: dto.type === ConversationType.GROUP ? [userObjectId] : [],
+      settings: dto.settings,
     });
 
     return await conversation.save();
@@ -40,23 +56,25 @@ export class ChatService {
 
   // Get user conversations
   async getUserConversations(userId: string) {
+    const objectId = new Types.ObjectId(userId);
     return await this.conversationModel
       .find({
-        participants: userId,
+        participants: objectId,
         isArchived: false,
       })
       .populate('participants', 'name username avatar')
-      .populate('lastMessage')
-      .sort({ lastMessageAt: -1 })
+      .sort({ createdAt: -1 })
       .exec();
   }
 
   // Get conversation by ID
   async getConversation(conversationId: string, userId: string) {
+    const conversationObjectId = new Types.ObjectId(conversationId);
+    const userObjectId = new Types.ObjectId(userId);
     const conversation = await this.conversationModel
       .findOne({
-        _id: conversationId,
-        participants: userId,
+        _id: conversationObjectId,
+        participants: userObjectId,
       })
       .populate('participants', 'name username avatar')
       .exec();
@@ -70,10 +88,13 @@ export class ChatService {
 
   // Send a message
   async sendMessage(userId: string, dto: SendMessageDto) {
+    const userObjectId = new Types.ObjectId(userId);
+    const conversationObjectId = new Types.ObjectId(dto.conversationId);
+    
     // Verify user is participant
     const conversation = await this.conversationModel.findOne({
-      _id: dto.conversationId,
-      participants: userId,
+      _id: conversationObjectId,
+      participants: userObjectId,
     });
 
     if (!conversation) {
@@ -81,40 +102,30 @@ export class ChatService {
     }
 
     const message = new this.messageModel({
-      sender: userId,
-      conversationId: dto.conversationId,
+      sender: userObjectId,
+      conversationId: conversationObjectId,
       content: dto.content,
       type: dto.type,
-      replyTo: dto.replyTo,
-      attachments: dto.attachments,
+      status: MessageStatus.SENT,
+      replyTo: dto.replyTo ? new Types.ObjectId(dto.replyTo) : undefined,
+      attachments: dto.attachments || [],
+      metadata: dto.metadata,
     });
 
     await message.save();
-
-    // Update conversation's last message
-    await this.conversationModel.findByIdAndUpdate(dto.conversationId, {
-      lastMessage: message._id,
-      lastMessageAt: new Date(),
-      $inc: {
-        // Increment unread count for all participants except sender
-        ...conversation.participants
-          .filter((p) => p.toString() !== userId)
-          .reduce((acc, participantId) => {
-            acc[`participantMetadata.${participantId}.unreadCount`] = 1;
-            return acc;
-          }, {}),
-      },
-    });
 
     return await message.populate('sender', 'name username avatar');
   }
 
   // Get messages for a conversation
   async getMessages(conversationId: string, userId: string, limit = 50, before?: string) {
+    const conversationObjectId = new Types.ObjectId(conversationId);
+    const userObjectId = new Types.ObjectId(userId);
+    
     // Verify user is participant
     const conversation = await this.conversationModel.findOne({
-      _id: conversationId,
-      participants: userId,
+      _id: conversationObjectId,
+      participants: userObjectId,
     });
 
     if (!conversation) {
@@ -122,12 +133,12 @@ export class ChatService {
     }
 
     const query: any = {
-      conversationId,
+      conversationId: conversationObjectId,
       isDeleted: false,
     };
 
     if (before) {
-      query._id = { $lt: before };
+      query._id = { $lt: new Types.ObjectId(before) };
     }
 
     return await this.messageModel
@@ -141,9 +152,13 @@ export class ChatService {
 
   // Mark message as read
   async markAsRead(conversationId: string, messageId: string, userId: string) {
+    const messageObjectId = new Types.ObjectId(messageId);
+    const conversationObjectId = new Types.ObjectId(conversationId);
+    const userObjectId = new Types.ObjectId(userId);
+    
     const message = await this.messageModel.findOne({
-      _id: messageId,
-      conversationId,
+      _id: messageObjectId,
+      conversationId: conversationObjectId,
     });
 
     if (!message) {
@@ -154,13 +169,14 @@ export class ChatService {
     const alreadyRead = message.readBy.some((r) => r.userId.toString() === userId);
     if (!alreadyRead) {
       message.readBy.push({
-        userId: new Types.ObjectId(userId),
+        userId: userObjectId,
         readAt: new Date(),
       });
+      message.status = MessageStatus.READ;
       await message.save();
 
       // Update conversation unread count
-      await this.conversationModel.findByIdAndUpdate(conversationId, {
+      await this.conversationModel.findByIdAndUpdate(conversationObjectId, {
         [`participantMetadata.${userId}.unreadCount`]: 0,
         [`participantMetadata.${userId}.lastReadAt`]: new Date(),
       });
@@ -171,24 +187,28 @@ export class ChatService {
 
   // Mark all messages in conversation as read
   async markConversationAsRead(conversationId: string, userId: string) {
+    const conversationObjectId = new Types.ObjectId(conversationId);
+    const userObjectId = new Types.ObjectId(userId);
+    
     // Get all unread messages
     const messages = await this.messageModel.find({
-      conversationId,
-      'readBy.userId': { $ne: userId },
-      sender: { $ne: userId },
+      conversationId: conversationObjectId,
+      'readBy.userId': { $ne: userObjectId },
+      sender: { $ne: userObjectId },
     });
 
     // Mark all as read
     for (const message of messages) {
       message.readBy.push({
-        userId: new Types.ObjectId(userId),
+        userId: userObjectId,
         readAt: new Date(),
       });
+      message.status = MessageStatus.READ;
       await message.save();
     }
 
     // Reset unread count
-    await this.conversationModel.findByIdAndUpdate(conversationId, {
+    await this.conversationModel.findByIdAndUpdate(conversationObjectId, {
       [`participantMetadata.${userId}.unreadCount`]: 0,
       [`participantMetadata.${userId}.lastReadAt`]: new Date(),
     });
@@ -196,9 +216,12 @@ export class ChatService {
 
   // Delete message
   async deleteMessage(messageId: string, userId: string) {
+    const messageObjectId = new Types.ObjectId(messageId);
+    const userObjectId = new Types.ObjectId(userId);
+    
     const message = await this.messageModel.findOne({
-      _id: messageId,
-      sender: userId,
+      _id: messageObjectId,
+      sender: userObjectId,
     });
 
     if (!message) {
@@ -214,42 +237,53 @@ export class ChatService {
 
   // Add participants to group
   async addParticipants(conversationId: string, userId: string, newParticipants: string[]) {
+    const conversationObjectId = new Types.ObjectId(conversationId);
+    const userObjectId = new Types.ObjectId(userId);
+    const participantObjectIds = newParticipants.map(p => new Types.ObjectId(p));
+    
     const conversation = await this.conversationModel.findOne({
-      _id: conversationId,
+      _id: conversationObjectId,
       type: { $in: [ConversationType.GROUP, ConversationType.CHANNEL] },
-      $or: [{ admins: userId }, { createdBy: userId }],
+      $or: [{ admins: userObjectId }, { createdBy: userObjectId }],
     });
 
     if (!conversation) {
       throw new ForbiddenException('Only admins can add participants');
     }
 
-    await this.conversationModel.findByIdAndUpdate(conversationId, {
-      $addToSet: { participants: { $each: newParticipants } },
+    await this.conversationModel.findByIdAndUpdate(conversationObjectId, {
+      $addToSet: { participants: { $each: participantObjectIds } },
     });
   }
 
   // Remove participant from group
   async removeParticipant(conversationId: string, userId: string, participantToRemove: string) {
+    const conversationObjectId = new Types.ObjectId(conversationId);
+    const userObjectId = new Types.ObjectId(userId);
+    const participantObjectId = new Types.ObjectId(participantToRemove);
+    
     const conversation = await this.conversationModel.findOne({
-      _id: conversationId,
+      _id: conversationObjectId,
       type: { $in: [ConversationType.GROUP, ConversationType.CHANNEL] },
-      $or: [{ admins: userId }, { createdBy: userId }],
+      $or: [{ admins: userObjectId }, { createdBy: userObjectId }],
     });
 
     if (!conversation) {
       throw new ForbiddenException('Only admins can remove participants');
     }
 
-    await this.conversationModel.findByIdAndUpdate(conversationId, {
-      $pull: { participants: participantToRemove },
+    await this.conversationModel.findByIdAndUpdate(conversationObjectId, {
+      $pull: { participants: participantObjectId },
     });
   }
 
   // Leave conversation
   async leaveConversation(conversationId: string, userId: string) {
-    await this.conversationModel.findByIdAndUpdate(conversationId, {
-      $pull: { participants: userId, admins: userId },
+    const conversationObjectId = new Types.ObjectId(conversationId);
+    const userObjectId = new Types.ObjectId(userId);
+    
+    await this.conversationModel.findByIdAndUpdate(conversationObjectId, {
+      $pull: { participants: userObjectId, admins: userObjectId },
     });
   }
 }

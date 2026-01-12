@@ -1,10 +1,10 @@
 import axios from "axios"
 
-const apiUrl = import.meta.env.VITE_API_URL || 'https://dummyjson.com';
+const apiUrl = import.meta.env.VITE_BACKEND_URL || 'https://dummyjson.com';
 
 export const api = axios.create({
     baseURL: `${apiUrl}`,
-    withCredentials: true, // ✅ Include cookies (tương đương credentials: 'include' của fetch)
+    withCredentials: false, // ✅ Include cookies (tương đương credentials: 'include' của fetch)
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

@@ -2,9 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { MongoClient, Db } from 'mongodb';
 import { Migration, MigrationRecord } from './migration.interface';
 import { CreateUsersCollectionMigration } from './1_create_users_collection.migration';
-import { CreateInterestsCollectionMigration } from './2_create_interests_collection.migration';
-import { CreateConversationsCollectionMigration } from './3_create_conversations_collection.migration';
-import { CreateMessagesCollectionMigration } from './4_create_messages_collection.migration';
+import { CreateConversationsCollectionMigration } from './2_create_conversations_collection.migration';
+import { CreateMessagesCollectionMigration } from './3_create_messages_collection.migration';
+import { CreateMessageStatusCollectionMigration } from './4_create_message_status_collection.migration';
+import { CreateAttachmentsCollectionMigration } from './5_create_attachments_collection.migration';
+import { CreateNotificationsCollectionMigration } from './6_create_notifications_collection.migration';
+import { CreateBlockedUsersCollectionMigration } from './7_create_blocked_users_collection.migration';
+import { CreateGroupSettingsCollectionMigration } from './8_create_group_settings_collection.migration';
+import { CreateParticipantsCollectionMigration } from './9_create_participants_collection.migration';
+import { CreateUserContactsCollectionMigration } from './10_create_user_contacts_collection.migration';
 
 @Injectable()
 export class MigrationService {
@@ -16,10 +22,16 @@ export class MigrationService {
   // List of all migrations in order
   private migrations: { [key: string]: Migration } = {
     '1_create_users_collection': new CreateUsersCollectionMigration(),
-    '2_create_interests_collection': new CreateInterestsCollectionMigration(),
-    '3_create_conversations_collection':
+    '2_create_conversations_collection':
       new CreateConversationsCollectionMigration(),
-    '4_create_messages_collection': new CreateMessagesCollectionMigration(),
+    '3_create_messages_collection': new CreateMessagesCollectionMigration(),
+    '4_create_message_status_collection': new CreateMessageStatusCollectionMigration(),
+    '5_create_attachments_collection': new CreateAttachmentsCollectionMigration(),
+    '6_create_notifications_collection': new CreateNotificationsCollectionMigration(),
+    '7_create_blocked_users_collection': new CreateBlockedUsersCollectionMigration(),
+    '8_create_group_settings_collection': new CreateGroupSettingsCollectionMigration(),
+    '9_create_participants_collection': new CreateParticipantsCollectionMigration(),
+    '10_create_user_contacts_collection': new CreateUserContactsCollectionMigration(),
   };
 
   constructor() {

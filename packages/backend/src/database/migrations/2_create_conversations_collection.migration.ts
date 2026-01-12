@@ -13,49 +13,29 @@ export class CreateConversationsCollectionMigration implements Migration {
           properties: {
             _id: { bsonType: 'objectId' },
             type: {
-              bsonType: 'string',
               enum: ['direct', 'group', 'channel'],
-              description: 'Type of conversation',
+              description: 'Type of conversation (direct message, group, or channel)',
             },
             participants: {
               bsonType: 'array',
               items: { bsonType: 'objectId' },
-              description: 'Array of user IDs',
+              description: 'Array of user IDs participating in conversation',
             },
             createdBy: {
               bsonType: 'objectId',
-              description: 'User who created the conversation',
+              description: 'User ID who created the conversation',
             },
             name: {
               bsonType: 'string',
-              description: 'Conversation name',
+              description: 'Conversation name (for groups and channels)',
             },
             avatar: {
               bsonType: 'string',
-              description: 'Avatar URL',
+              description: 'Avatar image URL',
             },
             description: {
               bsonType: 'string',
-              description: 'Conversation description',
-            },
-            participantMetadata: {
-              bsonType: 'object',
-              additionalProperties: true,
-              description: 'Per-user metadata',
-            },
-            admins: {
-              bsonType: 'array',
-              items: { bsonType: 'objectId' },
-              description: 'Admin user IDs',
-            },
-            isArchived: {
-              bsonType: 'bool',
-              description: 'Archive status',
-            },
-            settings: {
-              bsonType: 'object',
-              additionalProperties: true,
-              description: 'Conversation settings',
+              description: 'Description of the conversation',
             },
             createdAt: { bsonType: 'date' },
             updatedAt: { bsonType: 'date' },
@@ -65,12 +45,43 @@ export class CreateConversationsCollectionMigration implements Migration {
     });
 
     const collection = db.collection('conversations');
-    await collection.createIndex({ participants: 1 });
     await collection.createIndex({ type: 1 });
     await collection.createIndex({ createdBy: 1 });
     await collection.createIndex({ createdAt: -1 });
 
-    console.log('✅ Created conversations collection');
+    // Get sample user IDs for seeding (if users exist)
+    const usersCollection = db.collection('users');
+    const users = await usersCollection.find().limit(3).toArray();
+
+    if (users.length >= 2) {
+      // Seed sample conversations
+      const conversations: any[] = [
+        {
+          type: 'direct',
+          participants: [users[0]._id, users[1]._id],
+          createdBy: users[0]._id,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+
+      if (users.length >= 3) {
+        conversations.push({
+          type: 'group',
+          name: 'Development Team',
+          description: 'Group for development team discussions',
+          avatar: 'https://example.com/avatar.jpg',
+          participants: [users[0]._id, users[1]._id, users[2]._id],
+          createdBy: users[0]._id,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      }
+
+      await collection.insertMany(conversations);
+    }
+
+    console.log('✅ Created conversations collection with sample data');
   }
 
   async down(db: Db): Promise<void> {
