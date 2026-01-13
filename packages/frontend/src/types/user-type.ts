@@ -6,4 +6,8 @@ export interface UserType {
     lastName?: string;
     gender?: string;
     image?: string;
+    name?: string;
+    about?: string;
+    interests?: string[];
+    birthday?: string;
 }

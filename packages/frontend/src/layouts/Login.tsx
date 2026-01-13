@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext'
-import { UserType } from '@/types/user-type';
 import { LoginInputs } from '@/types/login-input';
 import Button from '@/common/components/Button';
 import InputCustom from '@/common/components/InputCustom';
+import { authApi } from '@/api/auth';
 
 function isTokenValid(token: string | null): boolean {
     if (!token) return false;
@@ -37,32 +37,26 @@ const Login = () => {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const name = event.target.name;
         const value = event.target.value;
+        console.log('value: ', value);
         setInputs(values => ({ ...values, [name]: value }))
     }
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         
-        // Mock user data for successful login
-        const mockUser: UserType = {
-            id: 1,
-            email: inputs.email || 'user@example.com',
-            username: inputs.email?.split('@')[0] || 'user',
-            firstName: 'Test',
-            lastName: 'User',
-            image: 'https://api.example.com/avatar.jpg',
-        };
+        try {
+            const response = await authApi.login({
+                email: inputs.email,
+                password: inputs.password
+            });
 
-        // Mock tokens with proper expiration (24 hours from now)
-        const expirationTime = Math.floor(Date.now() / 1000) + 24 * 60 * 60; // 24 hours in seconds
-        const mockAccessToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ id: 1, name: 'test', exp: expirationTime }))}.mock-signature`;
-        const mockRefreshToken = 'mock-refresh-token';
-
-        // Sử dụng AuthContext để lưu thông tin đăng nhập
-        login(mockAccessToken, mockRefreshToken, mockUser);
-
-        // Redirect to dashboard
-        navigate('/');
+            if (response.accessToken && response.user) {
+                login(response.accessToken, response.refreshToken, response.user);
+                navigate('/');
+            }
+        } catch (error) {
+            console.error('Login failed:', error);
+        }
     }
 
     return (
@@ -92,7 +86,7 @@ const Login = () => {
                                     </label>
                                     <div className="relative">
                                         <i className="fa-solid fa-user text-gray-500 text-sm absolute top-0 left-0 p-2"></i>
-                                        <InputCustom type="email" name="email" value={inputs.email || ""} onChange={handleChange} placeholder="Enter your email" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-md h-9 block w-full pl-6" required />
+                                        <InputCustom type="email" name="email" value={inputs.email} onChange={handleChange} placeholder="Enter your email" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-md h-9 block w-full pl-6" required />
                                     </div>
                                 </div>
                                 <div>
@@ -106,7 +100,7 @@ const Login = () => {
                                         <i
                                             onClick={togglePassword}
                                             className="fa-solid fa-eye cursor-pointer text-gray-500 text-sm absolute top-0 left-0 p-2"></i>
-                                        <InputCustom type={showPassword ? 'text' : 'password'} name="password" value={inputs.password || ""} onChange={handleChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-md h-9 block w-full pl-6" required />
+                                        <InputCustom type={showPassword ? 'text' : 'password'} name="password" value={inputs.password} onChange={handleChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-md h-9 block w-full pl-6" required />
                                     </div>
                                 </div>
                                 <div className="flex items-start">

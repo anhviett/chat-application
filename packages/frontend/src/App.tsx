@@ -76,7 +76,7 @@ const MainLayout = () => {
               Thay đổi theo route: Chat/Contact/Profile/Group/Status/Setting
             */}
             <div className={`h-full bg-backgroundSidebar border-r border-gray-2 col-span-12 lg:col-span-3 lg:min-w-0 min-w-72 ${isInfoWindowOpen ? 'hidden lg:block' : 'col-span-12 lg:col-span-3'}`}>
-              <div className="pt-3 px-4 py-2.5 h-full">
+              <div className="pt-3 py-2.5 h-full">
                 {/* Dynamic routes rendering - Pass state & callbacks as props */}
                 <Outlet context={{ 
                   chatThreadId, 

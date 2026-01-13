@@ -42,13 +42,15 @@ export class ChatController {
 
   @Get('conversations')
   async getUserConversations(@Request() req) {
-    const userId = req.user?.id || 'temp-user-id';
+    const userId = req.user?.id || '6964c526d823f232a21daebb';
     return this.chatService.getUserConversations(userId);
   }
 
   @Get('conversations/:id')
   async getConversation(@Request() req, @Param('id') id: string) {
-    const userId = req.user?.id || 'temp-user-id';
+    const userId = req.user?.id || '6964c526d823f232a21daebb';
+    console.log('id, userId: ', id, userId);
+
     return this.chatService.getConversation(id, userId);
   }
 
@@ -58,19 +60,19 @@ export class ChatController {
   //   @Param('id') conversationId: string,
   //   @Body() dto: UpdateConversationDto,
   // ) {
-  //   const userId = req.user?.id || 'temp-user-id';
+  //   const userId = req.user?.id || '6964c526d823f232a21daebb';
   //   return this.chatService.updateConversation(conversationId, userId, dto);
   // }
 
   @Post('conversations/:id/read')
   async markConversationAsRead(@Request() req, @Param('id') conversationId: string) {
-    const userId = req.user?.id || 'temp-user-id';
+    const userId = req.user?.id || '6964c526d823f232a21daebb';
     return this.chatService.markConversationAsRead(conversationId, userId);
   }
 
   @Post('conversations/:id/leave')
   async leaveConversation(@Request() req, @Param('id') conversationId: string) {
-    const userId = req.user?.id || 'temp-user-id';
+    const userId = req.user?.id || '6964c526d823f232a21daebb';
     return this.chatService.leaveConversation(conversationId, userId);
   }
 
@@ -82,7 +84,7 @@ export class ChatController {
     @Param('id') conversationId: string,
     @Body() dto: AddParticipantsDto,
   ) {
-    const userId = req.user?.id || 'temp-user-id';
+    const userId = req.user?.id || '6964c526d823f232a21daebb';
     return this.chatService.addParticipants(conversationId, userId, dto.participants);
   }
 
@@ -92,7 +94,7 @@ export class ChatController {
     @Param('id') conversationId: string,
     @Param('userId') participantId: string,
   ) {
-    const userId = req.user?.id || 'temp-user-id';
+    const userId = req.user?.id || '6964c526d823f232a21daebb';
     return this.chatService.removeParticipant(conversationId, userId, participantId);
   }
 
@@ -105,7 +107,7 @@ export class ChatController {
     @Query('limit') limit?: string,
     @Query('before') before?: string,
   ) {
-    const userId = req.user?.id || 'temp-user-id';
+    const userId = req.user?.id || '6964c526d823f232a21daebb';
     return this.chatService.getMessages(
       conversationId,
       userId,
@@ -116,7 +118,7 @@ export class ChatController {
 
   @Post('messages')
   async sendMessage(@Request() req, @Body() dto: SendMessageDto) {
-    const userId = req.user?.id || 'temp-user-id';
+    const userId = req.user?.id || '6964c526d823f232a21daebb';
     return this.chatService.sendMessage(userId, dto);
   }
 
@@ -126,13 +128,13 @@ export class ChatController {
     @Param('id') messageId: string,
     @Body() dto: UpdateMessageDto,
   ) {
-    const userId = req.user?.id || 'temp-user-id';
+    const userId = req.user?.id || '6964c526d823f232a21daebb';
     // return this.chatService.updateMessage(messageId, userId, dto);
   }
 
   // @Delete('messages/:id')
   // async deleteMessage(@Request() req, @Param('id') messageId: string) {
-  //   const userId = req.user?.id || 'temp-user-id';
+  //   const userId = req.user?.id || '6964c526d823f232a21daebb';
   //   return this.chatService.deleteMessage(messageId, userId);
   // }
 
@@ -140,7 +142,7 @@ export class ChatController {
 
   // @Post('message-status')
   // async createMessageStatus(@Request() req, @Body() dto: CreateMessageStatusDto) {
-  //   const userId = req.user?.id || 'temp-user-id';
+  //   const userId = req.user?.id || '6964c526d823f232a21daebb';
   //   return this.chatService.createMessageStatus(userId, dto);
   // }
 
@@ -150,7 +152,7 @@ export class ChatController {
   //   @Param('id') messageStatusId: string,
   //   @Body() dto: UpdateMessageStatusDto,
   // ) {
-  //   const userId = req.user?.id || 'temp-user-id';
+  //   const userId = req.user?.id || '6964c526d823f232a21daebb';
   //   return this.chatService.updateMessageStatus(messageStatusId, userId, dto);
   // }
 
@@ -158,19 +160,19 @@ export class ChatController {
 
   // @Get('contacts')
   // async getUserContacts(@Request() req) {
-  //   const userId = req.user?.id || 'temp-user-id';
+  //   const userId = req.user?.id || '6964c526d823f232a21daebb';
   //   return this.chatService.getUserContacts(userId);
   // }
 
   // @Post('contacts')
   // async addUserContact(@Request() req, @Body() dto: CreateUserContactDto) {
-  //   const userId = req.user?.id || 'temp-user-id';
+  //   const userId = req.user?.id || '6964c526d823f232a21daebb';
   //   return this.chatService.addUserContact(userId, dto.friendId);
   // }
 
   // @Delete('contacts/:friendId')
   // async removeUserContact(@Request() req, @Param('friendId') friendId: string) {
-  //   const userId = req.user?.id || 'temp-user-id';
+  //   const userId = req.user?.id || '6964c526d823f232a21daebb';
   //   return this.chatService.removeUserContact(userId, friendId);
   // }
 
@@ -178,19 +180,19 @@ export class ChatController {
 
   // @Get('blocked')
   // async getBlockedUsers(@Request() req) {
-  //   const userId = req.user?.id || 'temp-user-id';
+  //   const userId = req.user?.id || '6964c526d823f232a21daebb';
   //   return this.chatService.getBlockedUsers(userId);
   // }
 
   // @Post('blocked')
   // async blockUser(@Request() req, @Body() dto: CreateBlockedUserDto) {
-  //   const userId = req.user?.id || 'temp-user-id';
+  //   const userId = req.user?.id || '6964c526d823f232a21daebb';
   //   return this.chatService.blockUser(userId, dto.blockedUserId);
   // }
 
   // @Delete('blocked/:blockedUserId')
   // async unblockUser(@Request() req, @Param('blockedUserId') blockedUserId: string) {
-  //   const userId = req.user?.id || 'temp-user-id';
+  //   const userId = req.user?.id || '6964c526d823f232a21daebb';
   //   return this.chatService.unblockUser(userId, blockedUserId);
   // }
 
@@ -198,7 +200,7 @@ export class ChatController {
 
   // @Get('notifications')
   // async getNotifications(@Request() req, @Query('limit') limit?: string) {
-  //   const userId = req.user?.id || 'temp-user-id';
+  //   const userId = req.user?.id || '6964c526d823f232a21daebb';
   //   return this.chatService.getNotifications(userId, limit ? parseInt(limit) : 50);
   // }
 
@@ -208,7 +210,7 @@ export class ChatController {
   //   @Param('id') notificationId: string,
   //   @Body() dto: MarkNotificationAsReadDto,
   // ) {
-  //   const userId = req.user?.id || 'temp-user-id';
+  //   const userId = req.user?.id || '6964c526d823f232a21daebb';
   //   return this.chatService.markNotificationAsRead(notificationId, userId, dto);
   // }
 
@@ -225,7 +227,7 @@ export class ChatController {
   //   @Param('conversationId') conversationId: string,
   //   @Body() dto: CreateGroupSettingDto,
   // ) {
-  //   const userId = req.user?.id || 'temp-user-id';
+  //   const userId = req.user?.id || '6964c526d823f232a21daebb';
   //   return this.chatService.createGroupSetting(conversationId, userId, dto);
   // }
 
@@ -236,7 +238,7 @@ export class ChatController {
   //   @Param('settingName') settingName: string,
   //   @Body() dto: UpdateGroupSettingDto,
   // ) {
-  //   const userId = req.user?.id || 'temp-user-id';
+  //   const userId = req.user?.id || '6964c526d823f232a21daebb';
   //   return this.chatService.updateGroupSetting(
   //     conversationId,
   //     settingName,
@@ -245,13 +247,13 @@ export class ChatController {
   //   );
   // }
 
-  // @Delete('conversations/:conversationId/settings/:settingName')
-  // async deleteGroupSetting(
-  //   @Request() req,
-  //   @Param('conversationId') conversationId: string,
-  //   @Param('settingName') settingName: string,
-  // ) {
-  //   const userId = req.user?.id || 'temp-user-id';
-  //   return this.chatService.deleteGroupSetting(conversationId, settingName, userId);
-  // }
+  @Delete('conversations/:conversationId/settings/:settingName')
+  async deleteGroupSetting(
+    @Request() req,
+    @Param('conversationId') conversationId: string,
+    @Param('settingName') settingName: string,
+  ) {
+    const userId = req.user?.id || '6964c526d823f232a21daebb';
+    return this.chatService.deleteGroupSetting(conversationId, settingName, userId);
+  }
 }

@@ -8,7 +8,7 @@ import {
   IsBoolean,
   IsDate,
 } from 'class-validator';
-import { MessageType } from '../schemas/message.schema';
+import { MessageType } from '../../common/enums/message-type.enum';
 
 // ============ CONVERSATION DTOs ============
 

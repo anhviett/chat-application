@@ -24,6 +24,7 @@ const InputCustom = ({ type, value, name, id, placeholder, className, required, 
             className={className}
             required={required}
             id={id}
+            name={name}
         />
     );
 }

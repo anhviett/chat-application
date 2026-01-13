@@ -21,6 +21,15 @@ export const authApi = {
 
         return response.data
     },
+    getMe: async function (cancel = false) {
+        const response = await api.request({
+            url: '/users/me',
+            method: "GET",
+            signal: cancel ? cancelApiObject[this.getMe.name].handleRequestCancellation().signal : undefined,
+        })
+
+        return response.data
+    },
 }
 
 const cancelApiObject = defineCancelApiObject(authApi)

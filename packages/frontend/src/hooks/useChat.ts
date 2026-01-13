@@ -23,19 +23,19 @@ import { chatSocket } from '../sockets/chatSocket';
 // ============================================
 
 // Interface cho Message - mô tả cấu trúc của một tin nhắn
-interface Message {
-  _id: string;               // ID duy nhất của message (từ MongoDB)
-  sender: {                  // Thông tin người gửi (nested object)
-    _id: string;             // ID của sender
+export interface Message {
+  id: number | string;       // ID message (number từ DB, string cho temp msg)
+  sender: {                  // Thông tin người gửi
+    id: number;              // ID của sender
     name: string;            // Tên hiển thị
     username: string;        // Username
-    avatar?: string;         // Avatar URL (optional - có thể không có)
+    avatar?: string;         // Avatar URL
   };
   content: string;           // Nội dung tin nhắn
-  conversationId: string;    // ID của conversation chứa message này
-  type: 'text' | 'image' | 'file' | 'audio' | 'video'; // Loại message (union type)
+  conversationId: number;    // ID của conversation
+  type: 'text' | 'image' | 'file' | 'audio' | 'video'; // Loại message
   status: 'sent' | 'delivered' | 'read'; // Trạng thái message
-  createdAt: string;         // Timestamp tạo message (ISO string)
+  createdAt: string;         // Timestamp tạo message
 }
 
 // Interface cho TypingUser - mô tả user đang gõ
@@ -103,7 +103,7 @@ export const useChat = ({ conversationId, autoConnect = true, autoJoinRoom = tru
 
     // Lấy JWT token từ localStorage (nơi lưu token sau khi login)
     // localStorage.getItem() return string hoặc null
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (!token) {
       console.error('No token found for socket connection');
       return; // Không có token thì không kết nối
@@ -181,15 +181,15 @@ export const useChat = ({ conversationId, autoConnect = true, autoJoinRoom = tru
   // ============================================
   useEffect(() => {
     // Định nghĩa handler cho event 'newMessage'
-    const handleNewMessage = (data: { message: Message; conversationId: string }) => {
+    const handleNewMessage = (data: { message: Message; conversationId: string | number }) => {
       // Chỉ xử lý nếu message thuộc conversation hiện tại
-      if (data.conversationId === conversationId) {
+      if (String(data.conversationId) === String(conversationId)) {
         // setMessages với callback function
         // 'prev' là giá trị hiện tại của state
         setMessages((prev) => {
           // Kiểm tra xem message đã tồn tại chưa (tránh duplicate)
           // array.find() tìm phần tử đầu tiên thỏa điều kiện
-          if (prev.find((m) => m._id === data.message._id)) {
+          if (prev.find((m) => m.id === data.message.id)) {
             return prev; // Nếu đã có, return state cũ (không update)
           }
           // Nếu chưa có, thêm message mới vào cuối array
@@ -276,11 +276,11 @@ export const useChat = ({ conversationId, autoConnect = true, autoJoinRoom = tru
 
   // Listen for read receipts
   useEffect(() => {
-    const handleMessageRead = (data: { messageId: string; conversationId: string; readBy: string }) => {
+    const handleMessageRead = (data: { messageId: number; conversationId: string; readBy: string }) => {
       if (data.conversationId === conversationId) {
         setMessages((prev) =>
           prev.map((msg) =>
-            msg._id === data.messageId ? { ...msg, status: 'read' as const } : msg
+            msg.id === data.messageId ? { ...msg, status: 'read' as const } : msg
           )
         );
       }
@@ -320,14 +320,14 @@ export const useChat = ({ conversationId, autoConnect = true, autoJoinRoom = tru
       // Tạo optimistic message object
       // Object này sẽ hiển thị trên UI ngay lập tức
       const optimisticMessage: Message = {
-        _id: tempId,                    // ID tạm thời
+        id: tempId,                     // ID tạm thời
         sender: {
-          _id: 'current-user',          // TODO: Replace với actual user ID từ auth context
+          id: 1,                        // TODO: Replace với actual user ID từ auth context
           name: 'You',                  // Tên hiển thị
           username: 'you',
         },
         content: content.trim(),        // Nội dung đã trim
-        conversationId,                 // ID của conversation
+        conversationId: Number(conversationId), // Convert string to number
         type: options?.type || 'text',  // Type: dùng options.type nếu có, không thì 'text'
         status: 'sent',                 // Trạng thái ban đầu
         createdAt: new Date().toISOString(), // Timestamp hiện tại dạng ISO string
@@ -354,7 +354,7 @@ export const useChat = ({ conversationId, autoConnect = true, autoJoinRoom = tru
       // LẮNG NGHE CONFIRMATION TỪ SERVER
       // ============================================
       // Khi server lưu message thành công, nó sẽ gửi event 'messageSent'
-      const handleMessageSent = (data: { tempId: string; messageId: string }) => {
+      const handleMessageSent = (data: { tempId: string; messageId: number }) => {
         // Kiểm tra xem confirmation này có phải cho message vừa gửi không
         if (data.tempId === tempId) {
           // Update message: thay tempId bằng messageId thật từ DB
@@ -362,8 +362,8 @@ export const useChat = ({ conversationId, autoConnect = true, autoJoinRoom = tru
             // array.map() tạo array mới bằng cách transform mỗi element
             prev.map((msg) => 
               // Ternary operator: condition ? valueIfTrue : valueIfFalse
-              (msg._id === tempId) 
-                ? { ...msg, _id: data.messageId, status: 'delivered' as const } // Update message này
+              (msg.id === tempId) 
+                ? { ...msg, id: data.messageId, status: 'delivered' as const } // Update message này
                 : msg // Giữ nguyên messages khác
             )
           );

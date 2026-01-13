@@ -1,23 +1,47 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import type { AuthContextType } from '@/types/auth-context';
 import type { UserType } from '@/types/user-type';
+import { authApi } from '@/api/auth';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<UserType | null>(null);
     const [accessToken, setAccessToken] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    // Load from Local Storage on mount
+    // Load from Local Storage on mount and verify token
     useEffect(() => {
-        const storedToken = localStorage.getItem('accessToken');
-        const storedUser = localStorage.getItem('user');
+        const initAuth = async () => {
+            const storedToken = localStorage.getItem('accessToken');
+            const storedUser = localStorage.getItem('user');
 
-        if (storedUser && storedToken) {
-            setAccessToken(storedToken);
-            setUser(JSON.parse(storedUser));
-        }
+            if (storedToken) {
+                setAccessToken(storedToken);
+                
+                // Try to fetch current user data from API to verify token is valid
+                try {
+                    const response = await authApi.getMe();
+                    if (response && response.user) {
+                        setUser(response.user);
+                        // Update localStorage with latest user data
+                        localStorage.setItem('user', JSON.stringify(response.user));
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch current user:', error);
+                    // If API fails, use stored user data
+                    if (storedUser) {
+                        setUser(JSON.parse(storedUser));
+                    } else {
+                        // Token is invalid, clear auth
+                        logout();
+                    }
+                }
+            }
+            setLoading(false);
+        };
 
+        initAuth();
     }, []);
 
     const login = (token: string, refreshToken: string, userData: UserType) => {
@@ -86,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, accessToken, login, logout, refreshAccessToken }}>
+        <AuthContext.Provider value={{ user, accessToken, login, logout, refreshAccessToken, loading }}>
             {children}
         </AuthContext.Provider>
     );

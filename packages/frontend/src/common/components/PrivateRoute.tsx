@@ -9,11 +9,13 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute = ({ children }: PrivateRouteProps) => {
-    const { accessToken, refreshAccessToken, logout } = useAuth();
+    const { accessToken, refreshAccessToken, logout, loading } = useAuth();
     const [isChecking, setIsChecking] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
+        if (loading) return; // Wait until AuthProvider is done initializing
+
         const checkAuth = async () => {
             // Nếu có accessToken, kiểm tra tính hợp lệ
             if (accessToken) {

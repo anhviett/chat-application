@@ -1,23 +1,18 @@
 import React from "react";
 import { useTyping } from "@/contexts/TypingContext";
+import { useConversations } from "../../../common/hooks/useConversations";
 
 type AllChatProps = {
-    onSelectChat: (id: number) => void;
+    onSelectChat: (id: string) => void;
 };
 
 const AllChat: React.FC<AllChatProps> = ({ onSelectChat }) => {
     const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
     const { typingUsers } = useTyping();
-
+    const { conversations } = useConversations();
     const toggleDropdown = () => {
         setIsDropdownOpen(!isDropdownOpen);
     };
-
-    const chats = [
-        { id: 1, name: 'John Doe', message: 'Hey, how are you?', time: '10:30 AM', unread: 2 },
-        { id: 2, name: 'Jane Smith', message: 'Meeting at 2 PM', time: 'Yesterday', unread: 0 },
-        { id: 3, name: 'Sam Wilson', message: 'Let\'s catch up later', time: '9:15 AM', unread: 5 },
-    ];
 
     return (
         <div className="all-chats-section py-1">
@@ -30,18 +25,18 @@ const AllChat: React.FC<AllChatProps> = ({ onSelectChat }) => {
                 </button>
             </div>
             <div className="chat-list space-y-2">
-                {chats.map(chat => {
-                    const isTyping = typingUsers[chat.id] || false;
+                {conversations.map(chat => {
+                    const isTyping = typingUsers[chat._id] || false;
 
                     return (
                         <div
-                            key={chat.id}
-                            onClick={() => onSelectChat(chat.id)}
+                            key={chat._id}
+                            onClick={() => onSelectChat(chat._id)}
                             className="flex items-center p-5 rounded-md cursor-pointer bg-white shadow-[0_1px_5px_1px_#f3f3f3] hover:shadow-[inset_0_0_0_2px_#6338f6]"
                         >
                             <img
                                 className="w-10 h-10 rounded-full mr-3"
-                                src={`https://i.pravatar.cc/150?img=${chat.id}`}
+                                src={`https://i.pravatar.cc/150?img=${chat._id}`}
                                 alt="avatar"
                             />
                             <div className="flex-1">

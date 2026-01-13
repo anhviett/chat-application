@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
+import { MessageType } from '../../common/enums/message-type.enum';
+export { MessageType };
 
 export type MessageDocument = HydratedDocument<Message>;
 
@@ -8,15 +10,6 @@ export enum MessageStatus {
   DELIVERED = 'delivered',
   READ = 'read',
 }
-
-export enum MessageType {
-  TEXT = 'text',
-  IMAGE = 'image',
-  FILE = 'file',
-  AUDIO = 'audio',
-  VIDEO = 'video',
-}
-
 @Schema({ timestamps: true })
 export class Message {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })

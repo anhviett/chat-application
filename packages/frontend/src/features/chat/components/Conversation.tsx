@@ -1,23 +1,26 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { useTyping } from '@/contexts/TypingContext';
+import { useChat } from '../../../hooks/useChat';
+import { useAuth } from '@/contexts/AuthContext';
 
 type ConversationProps = {
     chatThreadId?: number;
     onContactInfoToggle?: (isOpen: boolean) => void; // callback to notify parent component
 }
 
-const messages = [
-    { id: 'm1', author: 'other', text: 'Hey there! How are you?', time: '10:24 AM', avatar: 'https://dreamschat.dreamstechnologies.com/react/template/assets/img/profiles/avatar-15.jpg' },
-    { id: 'm2', author: 'me', text: "I'm good, thanks! Working on the chat UI.", time: '10:25 AM' },
-    { id: 'm3', author: 'other', text: 'Nice! The layout looks great already.', time: '10:26 AM', avatar: 'https://dreamschat.dreamstechnologies.com/react/template/assets/img/profiles/avatar-15.jpg' },
-    { id: 'm4', author: 'me', text: "I'll push more updates soon.", time: '10:26 AM' },
-];
-
 const Conversation: React.FC<ConversationProps> = ({ chatThreadId, onContactInfoToggle }) => {
     const [showContactInfo, setShowContactInfo] = useState(false);
     const [message, setMessage] = useState('');
     const { setUserTyping } = useTyping();
+    const { user } = useAuth();
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    
+    // Use chat hook to handle messages
+    const { sendMessage, messages } = useChat({
+        conversationId: chatThreadId?.toString() || '',
+        autoConnect: !!chatThreadId,
+        autoJoinRoom: !!chatThreadId,
+    });
 
     const handleContactInfoToggle = () => {
         const newState = !showContactInfo;
@@ -48,8 +51,8 @@ const Conversation: React.FC<ConversationProps> = ({ chatThreadId, onContactInfo
     const handleSendMessage = () => {
         if (!message.trim() || !chatThreadId) return;
 
-        // TODO: Send message logic
-        console.log('Sending:', message);
+        // Send message via socket
+        sendMessage(message.trim(), { type: 'text' });
 
         // Reset
         setMessage('');
@@ -96,19 +99,24 @@ const Conversation: React.FC<ConversationProps> = ({ chatThreadId, onContactInfo
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[url('https://dreamschat.dreamstechnologies.com/react/template/assets/bg-01-Cbualscf.png')]">
-                {messages.map((m) => (
-                    <div key={m.id} className={`flex ${m.author === 'me' ? 'justify-end' : 'justify-start'}`}>
-                        {m.author !== 'me' && (
-                            <img className="w-8 h-8 rounded-full mr-2 mt-1" src={m.avatar} alt="Avatar" />
-                        )}
-                        <div>
-                            <div className={`max-w-[75%] rounded-2xl px-3 py-2 ${m.author === 'me' ? 'bg-purple-1 text-white rounded-br-sm' : 'bg-[#0d0d0d] text-white rounded-bl-sm'}`}>
-                                <p className="text-sm leading-relaxed text-white">{m.text}</p>
+                {messages.map((m) => {
+                    const isMe = m.sender.id === user?.id || m.sender.id === 1; // Fallback to 1 for optimistic/mock if needed
+                    return (
+                        <div key={m.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                            {!isMe && (
+                                <img className="w-8 h-8 rounded-full mr-2 mt-1" src={m.sender.avatar || 'https://dreamschat.dreamstechnologies.com/react/template/assets/img/profiles/avatar-15.jpg'} alt="Avatar" />
+                            )}
+                            <div>
+                                <div className={`max-w-[75%] rounded-2xl px-3 py-2 ${isMe ? 'bg-purple-1 text-white rounded-br-sm' : 'bg-[#0d0d0d] text-white rounded-bl-sm'}`}>
+                                    <p className="text-sm leading-relaxed text-white">{m.content}</p>
+                                </div>
+                                <div className={`mt-1 text-[10px] text-gray-1 ${isMe ? 'text-right' : 'text-left'}`}>
+                                    {new Date(m.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                </div>
                             </div>
-                            <div className={`mt-1 text-[10px] text-gray-1 ${m.author === 'me' ? 'text-right' : 'text-left'}`}>{m.time}</div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             <div className="px-4 py-3 border-t border-gray-2">

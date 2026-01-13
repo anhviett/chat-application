@@ -1,5 +1,5 @@
 import Button from '@/common/components/Button';
-
+import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
 
 type TabKey = 'profile' | 'media' | 'links' | 'settings';
@@ -11,6 +11,8 @@ type InfoWindowProps = {
 
 const InfoWindow = ({ chatThreadId, onClose }: InfoWindowProps) => {
     const [activeTab,] = useState<TabKey>('profile');
+    const { user: currentUser } = useAuth();
+    console.log('user: ', currentUser);
 
     return (
         chatThreadId && (
@@ -61,7 +63,7 @@ const InfoWindow = ({ chatThreadId, onClose }: InfoWindowProps) => {
                                                 <div className="flex py-4">
                                                     <div className="profile-info">
                                                         <h6 className='text-black font-semibold text-sm'>Name</h6>
-                                                        <p className='text-base text-gray-1'>Edward Lietz</p>
+                                                        <p className='text-base text-gray-1'>Edward Lietz</p>{currentUser?.email}
                                                     </div>
                                                 </div>
                                                 <div className="flex py-4 border-t border-gray-2">

@@ -1,4 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  UseInterceptors,
+  Request,
+} from '@nestjs/common';
+import { ClassSerializerInterceptor } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -7,9 +20,29 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  /**
+   * Get currently logged-in user profile
+   * @param req - Express request object containing user from JWT
+   * @returns Current user data without password
+   */
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
+  async getMe(@Request() req: any) {
+    if (!req.user || !req.user._id) {
+      throw new Error('User not found in request');
+    }
+    
+    const currentUser = await this.usersService.findOne(req.user._id.toString());
+    return {
+      success: true,
+      data: currentUser,
+      message: 'User profile retrieved successfully',
+    };
+  }
+
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
-    console.log('Dang create user');
     return this.usersService.create(createUserDto);
   }
 

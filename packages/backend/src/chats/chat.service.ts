@@ -286,4 +286,18 @@ export class ChatService {
       $pull: { participants: userObjectId, admins: userObjectId },
     });
   }
+
+  async deleteGroupSetting(
+    conversationId: string,
+    settingName: string,
+    userId: string,
+  ) {
+    const conversationObjectId = new Types.ObjectId(conversationId);
+    const userObjectId = new Types.ObjectId(userId);
+    const conversation = await this.conversationModel.findOne({
+      _id: conversationObjectId,
+      type: { $in: [ConversationType.GROUP, ConversationType.CHANNEL] },
+      $or: [{ admins: userObjectId }, { createdBy: userObjectId }],
+    });
+  }
 }
