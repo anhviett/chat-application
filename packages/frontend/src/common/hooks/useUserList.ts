@@ -13,7 +13,7 @@ export function useUserList() {
             setError(null);
             try {
                 const data = await userApi.getAll();
-                setUsers(data.users);
+                setUsers(data);
             } catch (err: any) {
                 const message = err instanceof Error ? err.message : String(err);
                 setError(message || 'Failed to fetch users');

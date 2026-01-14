@@ -2,23 +2,7 @@
 // Location: packages/frontend/src/sockets/chatSocket.ts
 
 import { io, Socket } from 'socket.io-client';
-
-interface Message {
-  _id: string;
-  sender: {
-    _id: string;
-    name: string;
-    username: string;
-    avatar?: string;
-  };
-  content: string;
-  conversationId: string;
-  type: 'text' | 'image' | 'file' | 'audio' | 'video';
-  status: 'sent' | 'delivered' | 'read';
-  createdAt: string;
-  replyTo?: string;
-  attachments?: string[];
-}
+import { SendMessage } from '@/types/message-type';
 
 interface Conversation {
   _id: string;
@@ -26,7 +10,7 @@ interface Conversation {
   participants: any[];
   name?: string;
   avatar?: string;
-  lastMessage?: Message;
+  lastMessage?: SendMessage;
   lastMessageAt?: string;
 }
 
@@ -34,7 +18,7 @@ interface ChatSocketEvents {
   // Server → Client events
   onlineUsers: (users: string[]) => void;
   conversationCreated: (conversation: Conversation) => void;
-  newMessage: (data: { message: Message; conversationId: string }) => void;
+  newMessage: (data: { message: SendMessage; conversationId: string }) => void;
   messageSent: (data: { tempId: string; messageId: string }) => void;
   userTyping: (data: { userId: string; conversationId: string; username: string }) => void;
   userStoppedTyping: (data: { userId: string; conversationId: string }) => void;
@@ -55,7 +39,7 @@ class ChatSocket {
 
     const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
-    this.socket = io(`${BACKEND_URL}/chat`, {
+    this.socket = io(`${BACKEND_URL}`, {
       auth: {
         token: token,
       },
@@ -95,7 +79,7 @@ class ChatSocket {
       this.emit('conversationCreated', conversation);
     });
 
-    this.socket.on('newMessage', (data: { message: Message; conversationId: string }) => {
+    this.socket.on('newMessage', (data: { message: SendMessage; conversationId: string }) => {
       this.emit('newMessage', data);
     });
 
@@ -168,18 +152,19 @@ class ChatSocket {
   }
 
   sendMessage(data: {
-    conversationId: string;
+    conversationId?: string;
+    recipientId?: string;   // User ID để tạo direct message
     content: string;
     type?: 'text' | 'image' | 'file' | 'audio' | 'video';
-    replyTo?: string;
     attachments?: string[];
     tempId?: string;
   }) {
-    return this.socket?.emit('sendMessage', {
+    const messageData = {
       ...data,
       type: data.type || 'text',
       tempId: data.tempId || Date.now().toString(),
-    });
+    };
+    return this.socket?.emit('sendMessage', messageData);
   }
 
   startTyping(conversationId: string) {

@@ -30,9 +30,6 @@ export class Message {
   @Prop({ type: [{ userId: Types.ObjectId, readAt: Date }], default: [] })
   readBy: Array<{ userId: Types.ObjectId; readAt: Date }>;
 
-  @Prop({ type: Types.ObjectId, ref: 'Message' })
-  replyTo?: Types.ObjectId;
-
   @Prop({ type: [String], default: [] })
   attachments: string[];
 

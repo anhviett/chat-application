@@ -87,10 +87,6 @@ export class SendMessageDto {
   @IsOptional()
   type?: MessageType;
 
-  @IsMongoId()
-  @IsOptional()
-  replyTo?: string;
-
   @IsArray()
   @IsString({ each: true })
   @IsOptional()

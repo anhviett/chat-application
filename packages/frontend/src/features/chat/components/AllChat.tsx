@@ -1,15 +1,29 @@
 import React from "react";
 import { useTyping } from "@/contexts/TypingContext";
-import { useConversations } from "../../../common/hooks/useConversations";
-
+import { useUserList } from "@/common/hooks/useUserList";
+import { ChatThread } from "@/types/message-type";
+import { Conversation } from "@/types/conversation-type";
+import { useConversations } from "@/common/hooks/useConversations";
 type AllChatProps = {
-    onSelectChat: (id: string) => void;
+    onSelectChat: (chatThread: ChatThread) => void;
 };
 
 const AllChat: React.FC<AllChatProps> = ({ onSelectChat }) => {
     const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
     const { typingUsers } = useTyping();
-    const { conversations } = useConversations();
+    const { users } = useUserList();
+    const { conversations, fetchConversation } = useConversations();
+    
+    const handleSelectChat = async (user: { _id: string; name: string }) => {
+        await fetchConversation(user._id);
+        const existingConv = conversations.find(c => c.participantId === user._id || c._id === user._id);
+        onSelectChat({ 
+            recipientId: user._id, 
+            name: user.name,
+            conversationId: existingConv?._id || existingConv?.id
+        });
+    };
+
     const toggleDropdown = () => {
         setIsDropdownOpen(!isDropdownOpen);
     };
@@ -25,24 +39,24 @@ const AllChat: React.FC<AllChatProps> = ({ onSelectChat }) => {
                 </button>
             </div>
             <div className="chat-list space-y-2">
-                {conversations.map(chat => {
-                    const isTyping = typingUsers[chat._id] || false;
+                {conversations.map(conversation => {
+                    const isTyping = typingUsers[conversation._id] || false;
 
                     return (
                         <div
-                            key={chat._id}
-                            onClick={() => onSelectChat(chat._id)}
+                            key={conversation._id}
+                            onClick={() => handleSelectChat({ _id: conversation._id, name: conversation.name })}
                             className="flex items-center p-5 rounded-md cursor-pointer bg-white shadow-[0_1px_5px_1px_#f3f3f3] hover:shadow-[inset_0_0_0_2px_#6338f6]"
                         >
                             <img
                                 className="w-10 h-10 rounded-full mr-3"
-                                src={`https://i.pravatar.cc/150?img=${chat._id}`}
+                                src={`https://i.pravatar.cc/150?img=${conversation._id}`}
                                 alt="avatar"
                             />
                             <div className="flex-1">
                                 <div className="flex justify-between">
-                                    <h6 className="font-semibold text-black">{chat.name}</h6>
-                                    <p className="text-sm text-gray-400">{chat.time}</p>
+                                    <h6 className="font-semibold text-black">{conversation.name}</h6>
+                                    <p className="text-sm text-gray-400">{conversation.birthday}</p>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     {isTyping ? (
@@ -53,11 +67,11 @@ const AllChat: React.FC<AllChatProps> = ({ onSelectChat }) => {
                                             <span className="w-1 h-1 bg-gray-500 rounded-full animate-dot-fade-3"></span>
                                         </p>
                                     ) : (
-                                        <p className="text-sm text-gray-400 truncate">{chat.message}</p>
+                                        <p className="text-sm text-gray-400 truncate">{conversation.message}</p>
                                     )}
-                                    {chat.unread > 0 && !isTyping && (
+                                    {conversation.unread > 0 && !isTyping && (
                                         <span className="bg-red-1 text-white text-xs font-bold rounded-full size-5 flex items-center justify-center">
-                                            {chat.unread}
+                                            {conversation.unread}
                                         </span>
                                     )}
                                 </div>

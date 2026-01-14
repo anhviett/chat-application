@@ -22,8 +22,8 @@ console.log(
 @Module({
   imports: [
     MongooseModule.forRoot(mongoUri),
-    ChatModule,
     AuthModule,
+    ChatModule,
     UsersModule,
   ],
   controllers: [AppController],

@@ -38,10 +38,6 @@ export class CreateMessagesCollectionMigration implements Migration {
               bsonType: 'array',
               description: 'Users who read this message',
             },
-            replyTo: {
-              bsonType: 'objectId',
-              description: 'Reply to message ID',
-            },
             attachments: {
               bsonType: 'array',
               items: { bsonType: 'string' },

@@ -7,7 +7,7 @@ import type { LayoutContextType } from '@/types/layout-context';
 const Chat = () => {
     // 📥 NHẬN CONTEXT TỪ OUTLET - Lấy props từ MainLayout qua context
     const {
-        setChatThreadId
+        setChatThread
     } = useOutletContext<LayoutContextType>();
     // ❌ KHÔNG CẦN STATE NỮA - Vì đã nhận từ props
     // const [isToggleInvite, setIsToggleInvite] = useState(false);
@@ -63,7 +63,7 @@ const Chat = () => {
             {/* Chat Tabs */}
             <div className="chat-tabs">
                 <RecentChat />
-                <AllChat onSelectChat={setChatThreadId} />
+                <AllChat onSelectChat={setChatThread} />
             </div>
         </>
     );

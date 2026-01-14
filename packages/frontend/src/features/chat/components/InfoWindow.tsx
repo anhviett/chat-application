@@ -1,21 +1,22 @@
 import Button from '@/common/components/Button';
 import { useAuth } from '@/contexts/AuthContext';
+import { ChatThread } from '@/types/message-type';
 import { useState } from 'react';
 
 type TabKey = 'profile' | 'media' | 'links' | 'settings';
 
 type InfoWindowProps = {
-    chatThreadId?: string;
+    chatThread?: ChatThread;
     onClose?: () => void;
 }
 
-const InfoWindow = ({ chatThreadId, onClose }: InfoWindowProps) => {
+const InfoWindow = ({ chatThread, onClose }: InfoWindowProps) => {
     const [activeTab,] = useState<TabKey>('profile');
     const { user: currentUser } = useAuth();
     console.log('user: ', currentUser);
 
     return (
-        chatThreadId && (
+        chatThread && (
             <div className="h-full bg-backgroundSidebar">
                 <div className="sticky top-0 z-10 bg-backgroundSidebar border-b border-gray-2 py-2.5">
                     <div className="px-4 py-3 flex items-center justify-between h-full">
@@ -34,8 +35,8 @@ const InfoWindow = ({ chatThreadId, onClose }: InfoWindowProps) => {
                             <div className="flex flex-col items-center text-center">
                                 <img className="w-20 h-20 rounded-full mb-3" src="https://dreamschat.dreamstechnologies.com/react/template/assets/img/profiles/avatar-15.jpg" alt="Avatar" />
                                 <h6 className="text-white font-semibold">
-                                    {chatThreadId !== null && chatThreadId !== undefined ? (
-                                        <span className="text-black text-base">Laverty {chatThreadId}</span>
+                                    {chatThread?.conversationId !== null && chatThread?.conversationId !== undefined ? (
+                                        <span className="text-black text-base">{chatThread.name}</span>
                                     ) : null}
                                 </h6>
                                 <p className="text-gray-1 text-sm">Online</p>

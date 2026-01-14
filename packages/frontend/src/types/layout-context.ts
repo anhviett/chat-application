@@ -1,8 +1,6 @@
-// 📥 DEFINE CONTEXT TYPE - TypeScript interface cho context từ MainLayout
+import { ChatThread } from "@/types/message-type";
 export type LayoutContextType = {
-    chatThreadId?: number;
-    setChatThreadId: (id: number | undefined) => void;
-    isToggleInvite: boolean;
-    handleToggleInvite: () => void;
+    chatThread?: ChatThread;
+    setChatThread: (chatThread: ChatThread) => void;
     handleToggleInfoWindow: () => void;
 };

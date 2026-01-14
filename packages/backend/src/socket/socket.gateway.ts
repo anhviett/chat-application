@@ -1,23 +1,96 @@
-import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody, ConnectedSocket } from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
+import { ChatService } from '../chats/chat.service';
+import { ObjectId } from 'mongoose';
 
-@WebSocketGateway({ cors: true })
-
-export class SocketGateway implements OnGatewayConnection, OnGatewayConnection {
+@WebSocketGateway({ cors: true, transports: ['websocket'] })
+export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
+  private onlineUsers = new Map<string, Socket>();
 
-  handleConnection(client: any, ...args: any[]) {
-    console.log(`Client connected: ${client.id}`);
-  }
+  constructor(private readonly chatService: ChatService) {}
 
-  handleDisconnect(client: any) {
-    console.log(`Client disconnected: ${client.id}`);
-  }
+  handleConnection(client: Socket, ...args: any[]) {
+    console.log(`[SocketGateway] Client connected: ${client.id}`);
+    this.onlineUsers.set(client.id, client);
     
-  @SubscribeMessage('message')
-  handleMessage(client: any, payload: any): void {
-    console.log(`Message received from ${client.id}: ${payload}`);
-    this.server.emit('message', payload); // Broadcast the message to all connected clients
+    // Broadcast online users list
+    this.server.emit('onlineUsers', Array.from(this.onlineUsers.keys()));
+  }
+
+  handleDisconnect(client: Socket) {
+    console.log(`[SocketGateway] Client disconnected: ${client.id}`);
+    this.onlineUsers.delete(client.id);
+    
+    // Broadcast updated online users list
+    this.server.emit('onlineUsers', Array.from(this.onlineUsers.keys()));
   }
   
+  // 1. React gửi message
+  @SubscribeMessage('sendMessage')
+  async handleSendMessage(@ConnectedSocket() client: Socket, @MessageBody() payload: any): Promise<void> {
+    try {
+      console.log(payload);
+      
+      // Validate payload
+      if (!payload.conversationId || !payload.content) {
+        throw new Error('conversationId and content are required');
+      }
+
+      if (!payload.userId) {
+        throw new Error('userId is required');
+      }
+
+      const userId = payload.userId;
+      // Lưu message vào database
+      const savedMessage = await this.chatService.sendMessage(userId, {
+        conversationId: payload.conversationId,
+        content: payload.content,
+        type: payload.type,
+        attachments: payload.attachments,
+        metadata: payload.metadata,
+      });
+      
+      console.log(`[SocketGateway] Message saved:`, savedMessage);
+      
+      // Gửi xác nhận cho client
+      client.emit('messageSent', { success: true, message: savedMessage });
+      
+      // Broadcast cho tất cả client khác
+      client.broadcast.emit('newMessage', savedMessage);
+    } catch (error) {
+      console.error(`[SocketGateway] sendMessage error:`, error);
+      client.emit('messageError', { error: error.message });
+    }
+  }
+
+  // 2. React gửi typing status
+  @SubscribeMessage('userTyping')
+  handleUserTyping(@ConnectedSocket() client: Socket, @MessageBody() payload: any): void {
+    console.log(`[SocketGateway] userTyping from ${client.id}:`, payload);
+    client.broadcast.emit('userTyping', { userId: client.id, ...payload });
+  }
+
+  @SubscribeMessage('userStoppedTyping')
+  handleUserStoppedTyping(@ConnectedSocket() client: Socket, @MessageBody() payload: any): void {
+    console.log(`[SocketGateway] userStoppedTyping from ${client.id}:`, payload);
+    client.broadcast.emit('userStoppedTyping', { userId: client.id, ...payload });
+  }
+
+  // 3. React request online users
+  @SubscribeMessage('getOnlineUsers')
+  handleGetOnlineUsers(@ConnectedSocket() client: Socket): void {
+    console.log(`[SocketGateway] getOnlineUsers from ${client.id}`);
+    const userList = Array.from(this.onlineUsers.keys());
+    client.emit('onlineUsers', userList);
+  }
+
+  // 4. React gửi message read status
+  @SubscribeMessage('markMessageRead')
+  handleMarkMessageRead(@ConnectedSocket() client: Socket, @MessageBody() payload: any): void {
+    console.log(`[SocketGateway] markMessageRead from ${client.id}:`, payload);
+    client.broadcast.emit('messageRead', { userId: client.id, ...payload });
+  }
 }
+
+

@@ -24,6 +24,7 @@ import {
   Outlet,
   useLocation
 } from 'react-router-dom';
+import { SendMessage, ChatThread } from '@/types/message-type';
 
 // Layout Component với 3 cột cố định
 const MainLayout = () => {
@@ -34,23 +35,26 @@ const MainLayout = () => {
   const currentPath = location.pathname;
 
   // 📦 STATE - Quản lý global layout state
-  const [chatThreadId, setChatThreadId] = useState<number | undefined>(undefined);
+  const [chatThread, setChatThread] = useState<ChatThread | undefined>(undefined);
   const [isInfoWindowOpen, setInfoWindowOpen] = useState<boolean>(false);
+  const [messages, setMessages] = useState<SendMessage[]>([]);
 
   useEffect(() => {
-    socket.on("connect", () => {
-      console.log("Connected:", socket.id);
-    });
+    const handleIncomingMessage = (data: SendMessage) => {
+      setMessages((prev) => [...prev, data]);
+    };
+
+    socket.on('message', handleIncomingMessage);
 
     return () => {
-      socket.off("connect");
+      socket.off('message', handleIncomingMessage);
     };
   }, []);
 
   // 🔄 RESET STATE khi chuyển route (trừ khi ở /chat)
   useEffect(() => {
     if (currentPath !== '/' && currentPath !== '/chat') {
-      setChatThreadId(undefined);
+      setChatThread(undefined);
       setInfoWindowOpen(false);
     }
   }, [currentPath]);
@@ -79,8 +83,8 @@ const MainLayout = () => {
               <div className="pt-3 py-2.5 h-full">
                 {/* Dynamic routes rendering - Pass state & callbacks as props */}
                 <Outlet context={{ 
-                  chatThreadId, 
-                  setChatThreadId, 
+                  chatThread, 
+                  setChatThread, 
                   handleToggleInfoWindow 
                 }} />
               </div>
@@ -91,11 +95,11 @@ const MainLayout = () => {
               Persistent - Luôn hiển thị như footer
             */}
             <div className={`h-full lg:ml-0 ml-14 ${isInfoWindowOpen ? 'hidden lg:block lg:col-span-6' : 'col-span-9'}`}>
-              {!chatThreadId ? (
+              {!chatThread ? (
                 <ChatDefault className={`${isInfoWindowOpen ? '' : 'hidden lg:flex'}`} />
               ) : (
                 <Conversation
-                  chatThreadId={chatThreadId}
+                  chatThread={chatThread}
                   onContactInfoToggle={handleToggleInfoWindow}
                 />
               )}
@@ -108,7 +112,7 @@ const MainLayout = () => {
             {isInfoWindowOpen && (
               <div className={`col-span-12 lg:col-span-3 h-full outline-0 transition min-w-[unset] transform duration-300 ease-in-out ${isInfoWindowOpen ? 'w-full transform-none' : 'w-0'}`}>
                 <InfoWindow
-                  chatThreadId={chatThreadId?.toString()}
+                  chatThread={chatThread}
                   onClose={handleToggleInfoWindow}
                 />
               </div>

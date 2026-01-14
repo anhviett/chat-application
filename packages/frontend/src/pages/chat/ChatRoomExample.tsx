@@ -2,7 +2,7 @@
 // Location: packages/frontend/src/pages/chat/ChatRoom.tsx
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useChat } from '../../hooks/useChat';
+import { useChat } from '../../common/hooks/useChat';
 import { useParams } from 'react-router-dom';
 
 interface ChatRoomProps {

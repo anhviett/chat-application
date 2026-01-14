@@ -27,7 +27,7 @@ export const chatApi = {
             url: "/messages",
             method: "POST",
             data: data,
-            signal: cancel ? cancelApiObject[this.snedMessage.name].handleRequestCancellation().signal : undefined,
+            signal: cancel ? cancelApiObject[this.sendMessage.name].handleRequestCancellation().signal : undefined,
         })
         return response.data;
     },

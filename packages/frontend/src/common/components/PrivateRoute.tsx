@@ -17,49 +17,54 @@ const PrivateRoute = ({ children }: PrivateRouteProps) => {
         if (loading) return; // Wait until AuthProvider is done initializing
 
         const checkAuth = async () => {
-            // Nếu có accessToken, kiểm tra tính hợp lệ
-            if (accessToken) {
-                try {
-                    if (!isTokenValid(accessToken)) {
-                        // Token hết hạn, thử refresh
-                        console.log('Access token expired, attempting refresh...');
-                        await refreshAccessToken();
-                        setIsAuthenticated(true);
-                    } else if (isTokenExpiringSoon(accessToken)) {
-                        // Token sắp hết hạn, refresh proactively
-                        console.log('Access token expiring soon, refreshing...');
-                        try {
-                            await refreshAccessToken();
-                        } catch (error) {
-                            console.warn('Proactive refresh failed, but token still valid:', error);
-                        }
-                        setIsAuthenticated(true);
-                    } else {
-                        // Token còn hạn
-                        setIsAuthenticated(true);
-                    }
-                } catch (error) {
-                    console.error('Token validation failed:', error);
-                    logout();
-                    setIsAuthenticated(false);
-                }
-            } else {
-                // Không có token, thử refresh từ localStorage
-                const refreshToken = localStorage.getItem('refreshToken');
-                if (refreshToken) {
+            try {
+                // Nếu có accessToken, kiểm tra tính hợp lệ
+                if (accessToken) {
                     try {
-                        await refreshAccessToken();
-                        setIsAuthenticated(true);
+                        if (!isTokenValid(accessToken)) {
+                            // Token hết hạn, thử refresh
+                            console.log('Access token expired, attempting refresh...');
+                            await refreshAccessToken();
+                            setIsAuthenticated(true);
+                        } else if (isTokenExpiringSoon(accessToken)) {
+                            // Token sắp hết hạn, refresh proactively
+                            console.log('Access token expiring soon, refreshing...');
+                            try {
+                                await refreshAccessToken();
+                            } catch (error) {
+                                console.warn('Proactive refresh failed, but token still valid:', error);
+                            }
+                            setIsAuthenticated(true);
+                        } else {
+                            // Token còn hạn
+                            setIsAuthenticated(true);
+                        }
                     } catch (error) {
-                        console.error('Token refresh failed:', error);
+                        console.error('Token validation failed:', error);
                         logout();
                         setIsAuthenticated(false);
                     }
                 } else {
-                    setIsAuthenticated(false);
+                    // Không có token, thử refresh từ localStorage
+                    const refreshToken = localStorage.getItem('refreshToken');
+                    if (refreshToken) {
+                        try {
+                            await refreshAccessToken();
+                            setIsAuthenticated(true);
+                        } catch (error) {
+                            console.error('Token refresh failed:', error);
+                            logout();
+                            setIsAuthenticated(false);
+                        }
+                    } else {
+                        setIsAuthenticated(false);
+                    }
                 }
+                setIsChecking(false);
+            } catch (error) {
+                console.error('Unexpected error in checkAuth:', error);
+                setIsChecking(false);
             }
-            setIsChecking(false);
         };
 
         checkAuth();

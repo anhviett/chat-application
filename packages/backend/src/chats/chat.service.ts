@@ -107,7 +107,6 @@ export class ChatService {
       content: dto.content,
       type: dto.type,
       status: MessageStatus.SENT,
-      replyTo: dto.replyTo ? new Types.ObjectId(dto.replyTo) : undefined,
       attachments: dto.attachments || [],
       metadata: dto.metadata,
     });
@@ -144,7 +143,6 @@ export class ChatService {
     return await this.messageModel
       .find(query)
       .populate('sender', 'name username avatar')
-      .populate('replyTo')
       .sort({ createdAt: -1 })
       .limit(limit)
       .exec();

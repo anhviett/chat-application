@@ -1,14 +1,15 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { useTyping } from '@/contexts/TypingContext';
-import { useChat } from '../../../hooks/useChat';
+import { useChat } from '@/common/hooks/useChat';
 import { useAuth } from '@/contexts/AuthContext';
+import { ChatThread } from '@/types/message-type';
 
 type ConversationProps = {
-    chatThreadId?: number;
+    chatThread?: ChatThread;
     onContactInfoToggle?: (isOpen: boolean) => void; // callback to notify parent component
 }
 
-const Conversation: React.FC<ConversationProps> = ({ chatThreadId, onContactInfoToggle }) => {
+const Conversation: React.FC<ConversationProps> = ({ chatThread, onContactInfoToggle }) => {
     const [showContactInfo, setShowContactInfo] = useState(false);
     const [message, setMessage] = useState('');
     const { setUserTyping } = useTyping();
@@ -17,9 +18,8 @@ const Conversation: React.FC<ConversationProps> = ({ chatThreadId, onContactInfo
     
     // Use chat hook to handle messages
     const { sendMessage, messages } = useChat({
-        conversationId: chatThreadId?.toString() || '',
-        autoConnect: !!chatThreadId,
-        autoJoinRoom: !!chatThreadId,
+        conversationId: chatThread?.conversationId,
+        recipientId: chatThread?.recipientId,
     });
 
     const handleContactInfoToggle = () => {
@@ -32,10 +32,11 @@ const Conversation: React.FC<ConversationProps> = ({ chatThreadId, onContactInfo
     const handleTyping = useCallback((value: string) => {
         setMessage(value);
 
-        if (!chatThreadId) return;
+        const threadId = chatThread?.conversationId;
+        if (!threadId) return;
 
         // Emit typing = true
-        setUserTyping(chatThreadId, true);
+        setUserTyping(threadId, true);
 
         // Clear timeout cũ
         if (typingTimeoutRef.current) {
@@ -44,19 +45,20 @@ const Conversation: React.FC<ConversationProps> = ({ chatThreadId, onContactInfo
 
         // Set timeout mới - sau 2s không gõ thì tắt typing
         typingTimeoutRef.current = setTimeout(() => {
-            setUserTyping(chatThreadId, false);
+            setUserTyping(threadId, false);
         }, 500);
-    }, [chatThreadId, setUserTyping]);
+    }, [chatThread, setUserTyping]);
 
     const handleSendMessage = () => {
-        if (!message.trim() || !chatThreadId) return;
+        if (!message.trim() || !chatThread) return;
 
         // Send message via socket
         sendMessage(message.trim(), { type: 'text' });
 
         // Reset
         setMessage('');
-        setUserTyping(chatThreadId, false);
+        const threadId = chatThread._id || chatThread.id;
+        if (threadId) setUserTyping(threadId, false);
         
         if (typingTimeoutRef.current) {
             clearTimeout(typingTimeoutRef.current);
@@ -71,8 +73,8 @@ const Conversation: React.FC<ConversationProps> = ({ chatThreadId, onContactInfo
                     <div>
                         <p className="text-white font-semibold leading-tight">
                             {
-                                chatThreadId !== null && chatThreadId !== undefined ? (
-                                    <span className="text-black text-base">User {chatThreadId}</span>
+                                chatThread ? (
+                                    <span className="text-black text-base">{chatThread.name}</span>
                                 ) : null
                             }
                         </p>
@@ -100,10 +102,11 @@ const Conversation: React.FC<ConversationProps> = ({ chatThreadId, onContactInfo
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[url('https://dreamschat.dreamstechnologies.com/react/template/assets/bg-01-Cbualscf.png')]">
                 {messages.map((m) => {
-                    const isMe = m.sender.id === user?.id || m.sender.id === 1; // Fallback to 1 for optimistic/mock if needed
+                    if (!m) return null; // Safety check
+                    const isMe = m.sender?.id === user?.id;
                     return (
                         <div key={m.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                            {!isMe && (
+                            {!isMe && m.sender && (
                                 <img className="w-8 h-8 rounded-full mr-2 mt-1" src={m.sender.avatar || 'https://dreamschat.dreamstechnologies.com/react/template/assets/img/profiles/avatar-15.jpg'} alt="Avatar" />
                             )}
                             <div>
@@ -119,7 +122,7 @@ const Conversation: React.FC<ConversationProps> = ({ chatThreadId, onContactInfo
                 })}
             </div>
 
-            <div className="px-4 py-3 border-t border-gray-2">
+            <div className="px-4 py-3 border-t border-gray-2 absolute bottom-0 w-full">
                 <div className="flex items-center gap-2">
                     <button className="text-black/80 hover:text-white"><i className="fa-regular fa-face-smile"></i></button>
                     <button className="text-black/80 hover:text-white"><i className="fa-solid fa-paperclip"></i></button>
