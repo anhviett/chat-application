@@ -12,11 +12,11 @@ export class CreateUserContactsCollectionMigration implements Migration {
           required: ['userId', 'friendId'],
           properties: {
             _id: { bsonType: 'objectId' },
-            userId: {
+            user_id: {
               bsonType: 'objectId',
               description: 'User ID who has the contact',
             },
-            friendId: {
+            friend_id: {
               bsonType: 'objectId',
               description: 'Contact user ID (friend)',
             },
@@ -27,9 +27,9 @@ export class CreateUserContactsCollectionMigration implements Migration {
     });
 
     const collection = db.collection('userContacts');
-    await collection.createIndex({ userId: 1 });
-    await collection.createIndex({ friendId: 1 });
-    await collection.createIndex({ userId: 1, friendId: 1 }, { unique: true });
+    await collection.createIndex({ user_id: 1 });
+    await collection.createIndex({ friend_id: 1 });
+    await collection.createIndex({ user_id: 1, friend_id: 1 }, { unique: true });
     await collection.createIndex({ createdAt: -1 });
 
     console.log('✅ Created userContacts collection');

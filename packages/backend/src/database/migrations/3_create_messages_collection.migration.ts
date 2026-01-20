@@ -16,7 +16,7 @@ export class CreateMessagesCollectionMigration implements Migration {
               bsonType: 'objectId',
               description: 'User ID of message sender',
             },
-            conversationId: {
+            conversation_id: {
               bsonType: 'objectId',
               description: 'Reference to conversation',
             },
@@ -65,8 +65,8 @@ export class CreateMessagesCollectionMigration implements Migration {
 
     const collection = db.collection('messages');
     await collection.createIndex({ sender: 1 });
-    await collection.createIndex({ conversationId: 1 });
-    await collection.createIndex({ conversationId: 1, createdAt: -1 });
+    await collection.createIndex({ conversation_id: 1 });
+    await collection.createIndex({ conversation_id: 1, createdAt: -1 });
     await collection.createIndex({ createdAt: -1 });
     await collection.createIndex({ status: 1 });
 

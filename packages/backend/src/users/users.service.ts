@@ -15,20 +15,20 @@ export class UsersService {
   async create(dto: CreateUserDto) {
     // Check if user already exists
     const existingUser = await this.userModel.findOne({
-      $or: [{ email: dto.email }, { username: dto.username }],
+      $or: [{ email: dto.email }],
     });
 
     if (existingUser) {
-      throw new BadRequestException('User with this email or username already exists');
+      throw new BadRequestException('User with this email already exists');
     }
 
     // Hash password - bcrypt includes salt automatically
     const hashedPassword = await PasswordHashHelper.hash(dto.password);
 
     const createdUser = new this.userModel({
-      name: dto.name,
+      firstName: dto.firstName,
+      lastName: dto.lastName,
       email: dto.email,
-      username: dto.username || dto.email.split('@')[0], // Use email prefix as default username
       password: hashedPassword,
       about: dto.about,
       birthday: dto.birthday,
@@ -40,7 +40,7 @@ export class UsersService {
 
     try {
       const savedUser = await createdUser.save();
-      console.log('✅ User created successfully:', savedUser._id);
+      console.log('✅ User created successfully:', savedUser.id);
       return this.sanitizeUser(savedUser);
     } catch (error) {
       console.error('❌ Error creating user:', error.message);
@@ -78,8 +78,8 @@ export class UsersService {
     return this.userModel.find().select('-password').exec();
   }
 
-  async findOne(id: string) {
-    const user = await this.userModel.findById(id).select('-password').exec();
+  async findOne(_id: string) {
+    const user = await this.userModel.findById(_id).select('-password').exec();
     
     if (!user) {
       throw new NotFoundException('User not found');
@@ -88,9 +88,9 @@ export class UsersService {
     return user;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async update(_id: string, updateUserDto: UpdateUserDto) {
     const user = await this.userModel
-      .findByIdAndUpdate(id, updateUserDto, { new: true })
+      .findByIdAndUpdate(_id, updateUserDto, { new: true })
       .select('-password')
       .exec();
 
@@ -101,8 +101,8 @@ export class UsersService {
     return user;
   }
 
-  async remove(id: string) {
-    const user = await this.userModel.findByIdAndDelete(id).exec();
+  async remove(_id: string) {
+    const user = await this.userModel.findByIdAndDelete(_id).exec();
 
     if (!user) {
       throw new NotFoundException('User not found');

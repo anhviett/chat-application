@@ -7,11 +7,12 @@ import Profile from "@/pages/profile/Index";
 import Group from "@/pages/groups/Index";
 import Setting from "@/pages/settings/Index";
 import Status from "@/pages/status/Index";
+import Gemini from "../gemini/Index";
 
 const Home = () => {
     // 📍 DETECT ACTIVE ROUTE - Nhận biết đang ở route nào
     const location = useLocation();
-    const currentPath = location.pathname; // VD: "/chat", "/contact", "/profile"
+    const currentPath = location.pathname;
 
     // 🔌 SOCKET CONNECTION
     useEffect(() => {
@@ -40,6 +41,8 @@ const Home = () => {
                 return <Status />;
             case '/setting':
                 return <Setting />;
+            case '/gemini':
+                return <Gemini />;
             default:
                 return <Chat />;
         }

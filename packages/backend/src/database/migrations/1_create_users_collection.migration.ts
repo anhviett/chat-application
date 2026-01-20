@@ -10,13 +10,16 @@ export class CreateUsersCollectionMigration implements Migration {
       validator: {
         $jsonSchema: {
           bsonType: 'object',
-          required: ['name', 'username', 'email', 'password'],
+          required: ['email', 'password'],
           properties: {
             _id: { bsonType: 'objectId' },
-            name: { bsonType: 'string', description: 'User full name' },
-            username: {
+            firstName: {
               bsonType: 'string',
-              description: 'Unique username for login',
+              description: 'User first name',
+            },
+            lastName: {
+              bsonType: 'string',
+              description: 'User last name',
             },
             email: {
               bsonType: 'string',
@@ -60,15 +63,14 @@ export class CreateUsersCollectionMigration implements Migration {
 
     // Create indexes for performance
     const collection = db.collection('users');
-    await collection.createIndex({ username: 1 }, { unique: true });
     await collection.createIndex({ email: 1 }, { unique: true });
     await collection.createIndex({ createdAt: -1 });
 
     // Seed sample users
     const users = [
       {
-        name: 'Alice Johnson',
-        username: 'alice_johnson',
+        firstName: 'Alice',
+        lastName: 'Johnson',
         email: 'alice@example.com',
         password: '$2b$10$hashedpassword1',
         about: 'Software developer passionate about web technologies',
@@ -81,8 +83,8 @@ export class CreateUsersCollectionMigration implements Migration {
         updatedAt: new Date(),
       },
       {
-        name: 'Bob Smith',
-        username: 'bob_smith',
+        firstName: 'Bob',
+        lastName: 'Smith',
         email: 'bob@example.com',
         password: '$2b$10$hashedpassword2',
         about: 'Designer and creative thinker',
@@ -95,8 +97,8 @@ export class CreateUsersCollectionMigration implements Migration {
         updatedAt: new Date(),
       },
       {
-        name: 'Carol Williams',
-        username: 'carol_williams',
+        firstName: 'Carol',
+        lastName: 'Williams',
         email: 'carol@example.com',
         password: '$2b$10$hashedpassword3',
         about: 'Marketing specialist and travel enthusiast',

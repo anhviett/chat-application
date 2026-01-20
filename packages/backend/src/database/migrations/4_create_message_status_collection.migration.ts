@@ -12,11 +12,11 @@ export class CreateMessageStatusCollectionMigration implements Migration {
           required: ['messageId', 'receiverId', 'status'],
           properties: {
             _id: { bsonType: 'objectId' },
-            messageId: {
+            message_id: {
               bsonType: 'objectId',
               description: 'Reference to message',
             },
-            receiverId: {
+            receiver_id: {
               bsonType: 'objectId',
               description: 'User ID of message receiver',
             },
@@ -33,8 +33,8 @@ export class CreateMessageStatusCollectionMigration implements Migration {
     });
 
     const collection = db.collection('messageStatus');
-    await collection.createIndex({ messageId: 1 });
-    await collection.createIndex({ receiverId: 1 });
+    await collection.createIndex({ message_id: 1 });
+    await collection.createIndex({ receiver_id: 1 });
     await collection.createIndex({ status: 1 });
     await collection.createIndex({ updatedAt: -1 });
 

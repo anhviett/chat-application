@@ -16,6 +16,7 @@ const SidebarMenu: React.FC<SidebarMenuProps> = () => {
         { icon: 'fa-regular fa-circle-dot', path: '/status', title: 'Status' },
         { icon: 'fa-regular fa-circle-user', path: '/profile', title: 'Profile' },
         { icon: 'fa-solid fa-gear', path: '/setting', title: 'Settings' },
+        { icon: 'fa-solid fa-robot', path: '/gemini', title: 'Gemini' },
     ];
 
     return (

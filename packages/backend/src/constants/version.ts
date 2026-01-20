@@ -1,0 +1,1 @@
+export const GEMINI = 'gemini-2.5-flash';

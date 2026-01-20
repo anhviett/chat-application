@@ -77,7 +77,7 @@ export class AddParticipantsDto {
 export class SendMessageDto {
   @IsMongoId()
   @IsNotEmpty()
-  conversationId: string;
+  conversation_id: string;
 
   @IsString()
   @IsNotEmpty()
@@ -112,11 +112,11 @@ export class UpdateMessageDto {
 export class CreateMessageStatusDto {
   @IsMongoId()
   @IsNotEmpty()
-  messageId: string;
+  message_id: string;
 
   @IsMongoId()
   @IsNotEmpty()
-  receiverId: string;
+  receiver_id: string;
 
   @IsEnum(['sent', 'delivered', 'read'])
   @IsNotEmpty()
@@ -134,13 +134,13 @@ export class UpdateMessageStatusDto {
 export class CreateUserContactDto {
   @IsMongoId()
   @IsNotEmpty()
-  friendId: string;
+  friend_id: string;
 }
 
 export class RemoveUserContactDto {
   @IsMongoId()
   @IsNotEmpty()
-  friendId: string;
+  friend_id: string;
 }
 
 // ============ NOTIFICATIONS DTOs ============
@@ -148,7 +148,7 @@ export class RemoveUserContactDto {
 export class CreateNotificationDto {
   @IsMongoId()
   @IsNotEmpty()
-  userId: string;
+  user_id: string;
 
   @IsEnum(['message', 'friend_request', 'group_invite', 'mention'])
   @IsNotEmpty()
@@ -170,13 +170,13 @@ export class MarkNotificationAsReadDto {
 export class CreateBlockedUserDto {
   @IsMongoId()
   @IsNotEmpty()
-  blockedUserId: string;
+  blockedUser_id: string;
 }
 
 export class RemoveBlockedUserDto {
   @IsMongoId()
   @IsNotEmpty()
-  blockedUserId: string;
+  blockedUser_id: string;
 }
 
 // ============ GROUP SETTINGS DTOs ============
@@ -200,17 +200,17 @@ export class UpdateGroupSettingDto {
 export class CreateParticipantDto {
   @IsMongoId()
   @IsNotEmpty()
-  conversationId: string;
+  conversation_id: string;
 
   @IsMongoId()
   @IsNotEmpty()
-  userId: string;
+  user_id: string;
 }
 
 export class RemoveParticipantDto {
   @IsMongoId()
   @IsNotEmpty()
-  userId: string;
+  user_id: string;
 }
 
 // ============ SOCKET/WEBSOCKET DTOs ============
@@ -218,21 +218,21 @@ export class RemoveParticipantDto {
 export class JoinRoomDto {
   @IsMongoId()
   @IsNotEmpty()
-  conversationId: string;
+  conversation_id: string;
 }
 
 export class TypingDto {
   @IsMongoId()
   @IsNotEmpty()
-  conversationId: string;
+  conversation_id: string;
 }
 
 export class ReadMessageDto {
   @IsMongoId()
   @IsNotEmpty()
-  conversationId: string;
+  conversation_id: string;
 
   @IsMongoId()
   @IsNotEmpty()
-  messageId: string;
+  message_id: string;
 }

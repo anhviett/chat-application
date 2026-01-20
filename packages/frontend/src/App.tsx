@@ -2,12 +2,14 @@ import PrivateRoute from '@/common/components/PrivateRoute';
 import ErrorBoundary from '@/common/components/ErrorBoundary';
 import Login from '@/layouts/Login';
 import Logout from '@/layouts/Logout';
+import Register from '@/layouts/Register';
 import Chat from '@/pages/chat/Index';
 import Contact from '@/pages/contacts/Index';
 import Setting from '@/pages/settings/Index';
 import Profile from '@/pages/profile/Index';
 import Group from '@/pages/groups/Index';
 import Status from '@/pages/status/Index';
+import Gemini from "@/pages/gemini/Index";
 import SidebarMenu from '@/features/chat/components/SidebarMenu';
 import InfoWindow from "@/features/chat/components/InfoWindow";
 import Conversation from "@/features/chat/components/Conversation";
@@ -16,6 +18,9 @@ import { TypingProvider } from '@/contexts/TypingContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { useAutoRefreshToken } from '@/common/hooks/useAutoRefreshToken';
 import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/stores/chat-app.store';
+import { toggleInfoWindow, backToList, setChatThread } from '@/stores/slices/chatUiSlice';
 import { socket } from "@/sockets/index";
 import {
   BrowserRouter as Router,
@@ -24,7 +29,7 @@ import {
   Outlet,
   useLocation
 } from 'react-router-dom';
-import { SendMessage, ChatThread } from '@/types/message-type';
+import { SendMessage } from '@/types/message-type';
 
 // Layout Component với 3 cột cố định
 const MainLayout = () => {
@@ -34,11 +39,11 @@ const MainLayout = () => {
   const location = useLocation();
   const currentPath = location.pathname;
 
-  // 📦 STATE - Quản lý global layout state
-  const [chatThread, setChatThread] = useState<ChatThread | undefined>(undefined);
-  const [isInfoWindowOpen, setInfoWindowOpen] = useState<boolean>(false);
+  // 📦 STATE - Quản lý global layout state qua Redux
+  const dispatch = useDispatch();
+  const chatThread = useSelector((state: RootState) => state.chatUi.chatThread);
+  const isInfoWindowOpen = useSelector((state: RootState) => state.chatUi.isInfoWindowOpen);
   const [messages, setMessages] = useState<SendMessage[]>([]);
-
   useEffect(() => {
     const handleIncomingMessage = (data: SendMessage) => {
       setMessages((prev) => [...prev, data]);
@@ -54,67 +59,61 @@ const MainLayout = () => {
   // 🔄 RESET STATE khi chuyển route (trừ khi ở /chat)
   useEffect(() => {
     if (currentPath !== '/' && currentPath !== '/chat') {
-      setChatThread(undefined);
-      setInfoWindowOpen(false);
+      dispatch(setChatThread(undefined));
     }
-  }, [currentPath]);
+  }, [currentPath, dispatch]);
 
-  // 🎯 CALLBACK FUNCTIONS
-  const handleToggleInfoWindow = () => {
-    setInfoWindowOpen(prevState => !prevState);
-  };
+  // Đã khai báo dispatch phía trên, không cần lặp lại
 
   return (
     <TypingProvider>
       <div className="h-screen overflow-hidden">
-        {/* Sidebar Menu - Cố định bên trái (72px) */}
-        <div className="w-0 lg:w-[72px] h-full fixed left-0 top-0 z-50 hidden lg:block">
+        {/* Sidebar Menu - Cố định bên trái (72px) - Ẩn trên mobile */}
+        <div className="w-[72px] h-full fixed left-0 top-0 z-50 hidden lg:block">
           <SidebarMenu />
         </div>
-        
+
         {/* Main Content Area - 3 cột layout */}
-        <div className="flex-1 ml-0 lg:ml-[72px] h-full overflow-hidden">
-          <div className="relative grid grid-cols-12 h-full">
+        <div className="flex-1 lg:ml-[72px] h-full overflow-hidden">
+          <div className="relative flex h-full">
             {/* 
-              📍 CỘT 1: SIDEBAR COMPONENT (col-span-3)
-              Thay đổi theo route: Chat/Contact/Profile/Group/Status/Setting
+              📍 CỘT 1: SIDEBAR COMPONENT
+              Mobile: Ẩn khi có chatThread hoặc InfoWindow mở
+              Desktop: Luôn hiển thị với width cố định
             */}
-            <div className={`h-full bg-backgroundSidebar border-r border-gray-2 col-span-12 lg:col-span-3 lg:min-w-0 min-w-72 ${isInfoWindowOpen ? 'hidden lg:block' : 'col-span-12 lg:col-span-3'}`}>
-              <div className="pt-3 py-2.5 h-full">
-                {/* Dynamic routes rendering - Pass state & callbacks as props */}
-                <Outlet context={{ 
-                  chatThread, 
-                  setChatThread, 
-                  handleToggleInfoWindow 
-                }} />
+            <div className={`h-full bg-backgroundSidebar border-r border-gray-2 flex-shrink-0
+              ${chatThread || isInfoWindowOpen ? 'hidden lg:block' : 'w-full'}
+              lg:w-[320px] xl:w-[380px]
+            `}>
+              <div className="pt-3 px-3 py-2.5 h-full">
+                <Outlet />
               </div>
             </div>
 
             {/* 
-              📍 CỘT 2: MAIN CONTENT (col-span-6/9)
-              Persistent - Luôn hiển thị như footer
+              📍 CỘT 2: MAIN CONTENT (Conversation)
+              Mobile: Full width khi có chatThread, ẩn khi không có
+              Desktop: Flex-1 để chiếm phần còn lại
             */}
-            <div className={`h-full lg:ml-0 ml-14 ${isInfoWindowOpen ? 'hidden lg:block lg:col-span-6' : 'col-span-9'}`}>
-              {!chatThread ? (
-                <ChatDefault className={`${isInfoWindowOpen ? '' : 'hidden lg:flex'}`} />
+            <div className={`h-full flex-1 min-w-0
+              ${!chatThread ? 'hidden lg:block' : 'w-full lg:w-auto'}
+              ${isInfoWindowOpen ? 'hidden lg:block' : ''}
+            `}>
+              {chatThread ? (
+                <Conversation/>
               ) : (
-                <Conversation
-                  chatThread={chatThread}
-                  onContactInfoToggle={handleToggleInfoWindow}
-                />
+                <ChatDefault className="hidden lg:flex" />
               )}
             </div>
 
             {/* 
-              📍 CỘT 3: INFO WINDOW (col-span-3)
-              Persistent - Hiển thị khi isInfoWindowOpen = true
+              📍 CỘT 3: INFO WINDOW
+              Mobile: Full width khi mở
+              Desktop: Width cố định bên phải
             */}
             {isInfoWindowOpen && (
-              <div className={`col-span-12 lg:col-span-3 h-full outline-0 transition min-w-[unset] transform duration-300 ease-in-out ${isInfoWindowOpen ? 'w-full transform-none' : 'w-0'}`}>
-                <InfoWindow
-                  chatThread={chatThread}
-                  onClose={handleToggleInfoWindow}
-                />
+              <div className="h-full flex-shrink-0 w-full lg:w-[320px] xl:w-[380px] border-l border-gray-2">
+                <InfoWindow/>
               </div>
             )}
           </div>
@@ -139,10 +138,12 @@ function App() {
               <Route path="/group" element={<Group />} />
               <Route path="/status" element={<Status />} />
               <Route path="/setting" element={<Setting />} />
+              <Route path="/gemini" element={<Gemini />} />
             </Route>
 
-            {/* Routes không có Sidebar (Login) */}
+            {/* Routes không có Sidebar (Login/Register) */}
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/logout" element={<Logout />} />
           </Routes>
         </Router>

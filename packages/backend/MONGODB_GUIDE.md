@@ -127,7 +127,6 @@ load('/path/to/mongodb-setup.js')
 {
   _id: ObjectId,
   name: String,                    // Tên người dùng
-  username: String,                // Username (unique)
   email: String,                   // Email (unique)
   password: String,                // Mật khẩu hash
   about: String,                   // Giới thiệu
@@ -183,13 +182,13 @@ load('/path/to/mongodb-setup.js')
 {
   _id: ObjectId,
   sender: ObjectId,                // User ID người gửi
-  conversationId: ObjectId,        // Ref to conversation
+  conversation_id: ObjectId,        // Ref to conversation
   content: String,                 // Nội dung
   type: String,                    // "text" | "image" | "file" | "audio" | "video"
   status: String,                  // "sent" | "delivered" | "read"
   readBy: [                        // Người đã đọc
     {
-      userId: ObjectId,
+      user_id: ObjectId,
       readAt: Date
     }
   ],

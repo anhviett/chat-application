@@ -12,11 +12,11 @@ export class CreateBlockedUsersCollectionMigration implements Migration {
           required: ['userId', 'blockedUserId'],
           properties: {
             _id: { bsonType: 'objectId' },
-            userId: {
+            user_id: {
               bsonType: 'objectId',
               description: 'User ID who blocked another user',
             },
-            blockedUserId: {
+            blockedUser_id: {
               bsonType: 'objectId',
               description: 'User ID of the blocked user',
             },
@@ -27,9 +27,9 @@ export class CreateBlockedUsersCollectionMigration implements Migration {
     });
 
     const collection = db.collection('blockedUsers');
-    await collection.createIndex({ userId: 1 });
-    await collection.createIndex({ blockedUserId: 1 });
-    await collection.createIndex({ userId: 1, blockedUserId: 1 }, { unique: true });
+    await collection.createIndex({ user_id: 1 });
+    await collection.createIndex({ blockedUser_id: 1 });
+    await collection.createIndex({ user_id: 1, blockedUser_id: 1 }, { unique: true });
     await collection.createIndex({ createdAt: -1 });
 
     console.log('✅ Created blockedUsers collection');

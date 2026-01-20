@@ -43,10 +43,10 @@ chats/
 | Event | Payload | Description |
 |-------|---------|-------------|
 | `createConversation` | `CreateConversationDto` | Create new conversation |
-| `joinRoom` | `{ conversationId: string }` | Join conversation room |
+| `joinRoom` | `{ conversation_id: string }` | Join conversation room |
 | `sendMessage` | `SendMessageDto` | Send a message |
-| `typing` | `{ conversationId: string }` | User started typing |
-| `stopTyping` | `{ conversationId: string }` | User stopped typing |
+| `typing` | `{ conversation_id: string }` | User started typing |
+| `stopTyping` | `{ conversation_id: string }` | User stopped typing |
 | `markAsRead` | `{ conversationId, messageId }` | Mark message as read |
 | `markConversationAsRead` | `{ conversationId }` | Mark all messages read |
 | `getOnlineUsers` | - | Get list of online users |
@@ -169,20 +169,20 @@ interface Message {
   sender: {
     _id: string;
     name: string;
-    username: string;
+    email: string;
   };
   content: string;
-  conversationId: string;
+  conversation_id: string;
   createdAt: string;
   status: 'sent' | 'delivered' | 'read';
 }
 
 interface TypingUser {
-  userId: string;
-  username: string;
+  user_id: string;
+  email: string;
 }
 
-export const useChat = (conversationId: string) => {
+export const useChat = (conversation_id: string) => {
   const { socket, isConnected } = useSocket();
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingUsers, setTypingUsers] = useState<TypingUser[]>([]);
@@ -195,14 +195,14 @@ export const useChat = (conversationId: string) => {
     socket.emit('joinRoom', { conversationId });
 
     // Listen for new messages
-    socket.on('newMessage', ({ message, conversationId: convId }) => {
+    socket.on('newMessage', ({ message, conversation_id: convId }) => {
       if (convId === conversationId) {
         setMessages((prev) => [...prev, message]);
       }
     });
 
     // Listen for typing indicators
-    socket.on('userTyping', ({ userId, username, conversationId: convId }) => {
+    socket.on('userTyping', ({ userId, username, conversation_id: convId }) => {
       if (convId === conversationId) {
         setTypingUsers((prev) => {
           if (prev.find((u) => u.userId === userId)) return prev;
@@ -211,7 +211,7 @@ export const useChat = (conversationId: string) => {
       }
     });
 
-    socket.on('userStoppedTyping', ({ userId, conversationId: convId }) => {
+    socket.on('userStoppedTyping', ({ userId, conversation_id: convId }) => {
       if (convId === conversationId) {
         setTypingUsers((prev) => prev.filter((u) => u.userId !== userId));
       }
@@ -237,7 +237,7 @@ export const useChat = (conversationId: string) => {
       setOnlineUsers((prev) =>
         status === 'online'
           ? [...new Set([...prev, userId])]
-          : prev.filter((id) => id !== userId)
+          : prev.filter((_id) => id !== userId)
       );
     });
 
@@ -281,7 +281,7 @@ export const useChat = (conversationId: string) => {
   }, [socket, conversationId]);
 
   const markAsRead = useCallback(
-    (messageId: string) => {
+    (message_id: string) => {
       if (!socket) return;
       socket.emit('markAsRead', { conversationId, messageId });
     },
@@ -309,8 +309,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useChat } from '../hooks/useChat';
 
 interface ChatRoomProps {
-  conversationId: string;
-  currentUserId: string;
+  conversation_id: string;
+  currentUser_id: string;
 }
 
 export const ChatRoom: React.FC<ChatRoomProps> = ({ conversationId, currentUserId }) => {
@@ -376,7 +376,7 @@ export const ChatRoom: React.FC<ChatRoomProps> = ({ conversationId, currentUserI
       <div className="messages-container">
         {messages.map((message) => (
           <div
-            key={message._id}
+            key={message.id}
             className={\`message \${
               message.sender._id === currentUserId ? 'message-sent' : 'message-received'
             }\`}
@@ -518,11 +518,11 @@ socket.on('connect', () => {
   console.log('Connected:', socket.id);
   
   // Join a room
-  socket.emit('joinRoom', { conversationId: 'test-conv-id' });
+  socket.emit('joinRoom', { conversation_id: 'test-conv-id' });
   
   // Send a message
   socket.emit('sendMessage', {
-    conversationId: 'test-conv-id',
+    conversation_id: 'test-conv-id',
     content: 'Hello World!',
     type: 'text',
   });

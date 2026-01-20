@@ -12,7 +12,7 @@ export class CreateNotificationsCollectionMigration implements Migration {
           required: ['userId'],
           properties: {
             _id: { bsonType: 'objectId' },
-            userId: {
+            user_id: {
               bsonType: 'objectId',
               description: 'User ID who receives the notification',
             },
@@ -36,11 +36,11 @@ export class CreateNotificationsCollectionMigration implements Migration {
     });
 
     const collection = db.collection('notifications');
-    await collection.createIndex({ userId: 1 });
+    await collection.createIndex({ user_id: 1 });
     await collection.createIndex({ type: 1 });
     await collection.createIndex({ isSeen: 1 });
     await collection.createIndex({ createdAt: -1 });
-    await collection.createIndex({ userId: 1, createdAt: -1 });
+    await collection.createIndex({ user_id: 1, createdAt: -1 });
 
     console.log('✅ Created notifications collection');
   }

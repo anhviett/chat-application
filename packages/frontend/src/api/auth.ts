@@ -12,10 +12,11 @@ export const authApi = {
 
         return response.data
     },
-    register: async function (cancel = false) {
+    register: async function (data: any, cancel = false) {
         const response = await api.request({
             url: "/auth/register",
             method: "POST",
+            data: data,
             signal: cancel ? cancelApiObject[this.register.name].handleRequestCancellation().signal : undefined,
         })
 

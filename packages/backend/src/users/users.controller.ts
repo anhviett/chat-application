@@ -29,11 +29,11 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   async getMe(@Request() req: any) {
-    if (!req.user || !req.user._id) {
+    if (!req.user || !req.user.id) {
       throw new Error('User not found in request');
     }
     
-    const currentUser = await this.usersService.findOne(req.user._id.toString());
+    const currentUser = await this.usersService.findOne(req.user.id.toString());
     return {
       success: true,
       data: currentUser,
@@ -52,17 +52,17 @@ export class UsersController {
   }
 
   // @Get(':id')
-  // findOne(@Param('id') id: string) {
+  // findOne(@Param('id') _id: string) {
   //   return this.usersService.findOne(+id);
   // }
 
   // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  // update(@Param('id') _id: string, @Body() updateUserDto: UpdateUserDto) {
   //   return this.usersService.update(+id, updateUserDto);
   // }
 
   // @Delete(':id')
-  // remove(@Param('id') id: string) {
+  // remove(@Param('id') _id: string) {
   //   return this.usersService.remove(+id);
   // }
 }

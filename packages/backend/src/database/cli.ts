@@ -142,6 +142,21 @@ class MigrationRunner {
           migrationsCount++;
         } catch (error) {
           console.error(`❌ Failed: ${name}`);
+          
+          // Enhanced error logging for Mongo validation errors
+          if (error.code === 121 || (error.writeErrors && error.writeErrors.some(e => e.code === 121))) {
+            console.error('🛑 MongoDB Schema Validation Error');
+            if (error.writeErrors) {
+              error.writeErrors.forEach(e => {
+                if (e.errInfo) {
+                  console.error('Validation Details:', JSON.stringify(e.errInfo, null, 2));
+                }
+              });
+            } else if (error.errInfo) {
+              console.error('Validation Details:', JSON.stringify(error.errInfo, null, 2));
+            }
+          }
+          
           console.error(error);
           throw error;
         }

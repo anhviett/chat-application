@@ -12,11 +12,11 @@ export class CreateParticipantsCollectionMigration implements Migration {
           required: ['conversationId', 'userId'],
           properties: {
             _id: { bsonType: 'objectId' },
-            conversationId: {
+            conversation_id: {
               bsonType: 'objectId',
               description: 'Reference to the conversation',
             },
-            userId: {
+            user_id: {
               bsonType: 'objectId',
               description: 'Reference to the user',
             },
@@ -29,9 +29,9 @@ export class CreateParticipantsCollectionMigration implements Migration {
     });
 
     const collection = db.collection('participants');
-    await collection.createIndex({ conversationId: 1 });
-    await collection.createIndex({ userId: 1 });
-    await collection.createIndex({ conversationId: 1, userId: 1 }, { unique: true });
+    await collection.createIndex({ conversation_id: 1 });
+    await collection.createIndex({ user_id: 1 });
+    await collection.createIndex({ conversation_id: 1, user_id: 1 }, { unique: true });
     await collection.createIndex({ joinedAt: -1 });
 
     console.log('✅ Created participants collection');

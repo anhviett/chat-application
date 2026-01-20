@@ -12,7 +12,7 @@ export class CreateGroupSettingsCollectionMigration implements Migration {
           required: ['conversationId'],
           properties: {
             _id: { bsonType: 'objectId' },
-            conversationId: {
+            conversation_id: {
               bsonType: 'objectId',
               description: 'Reference to conversation/group',
             },
@@ -32,9 +32,9 @@ export class CreateGroupSettingsCollectionMigration implements Migration {
     });
 
     const collection = db.collection('groupSettings');
-    await collection.createIndex({ conversationId: 1 });
+    await collection.createIndex({ conversation_id: 1 });
     await collection.createIndex({ settingName: 1 });
-    await collection.createIndex({ conversationId: 1, settingName: 1 }, { unique: true });
+    await collection.createIndex({ conversation_id: 1, settingName: 1 }, { unique: true });
     await collection.createIndex({ updatedAt: -1 });
 
     console.log('✅ Created groupSettings collection');

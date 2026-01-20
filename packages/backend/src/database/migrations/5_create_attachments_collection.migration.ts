@@ -12,7 +12,7 @@ export class CreateAttachmentsCollectionMigration implements Migration {
           required: ['sender', 'conversationId'],
           properties: {
             _id: { bsonType: 'objectId' },
-            messageId: {
+            message_id: {
               bsonType: 'int',
               description: 'ID of the message this attachment belongs to',
             },
@@ -41,8 +41,8 @@ export class CreateAttachmentsCollectionMigration implements Migration {
 
     const collection = db.collection('messages');
     await collection.createIndex({ sender: 1 });
-    await collection.createIndex({ conversationId: 1 });
-    await collection.createIndex({ conversationId: 1, createdAt: -1 });
+    await collection.createIndex({ conversation_id: 1 });
+    await collection.createIndex({ conversation_id: 1, createdAt: -1 });
     await collection.createIndex({ createdAt: -1 });
     await collection.createIndex({ status: 1 });
 
@@ -56,13 +56,13 @@ export class CreateAttachmentsCollectionMigration implements Migration {
       // Seed sample messages
       const messages = [
         {
-          sender: users[0]._id,
-          conversationId: conversations[0]._id,
+          sender: users[0].id,
+          conversation_id: conversations[0].id,
           content: 'Hey! How are you doing?',
           type: 'text',
           status: 'read',
           readBy: [
-            { userId: users[1]._id, readAt: new Date(Date.now() - 1800000) },
+            { user_id: users[1].id, readAt: new Date(Date.now() - 1800000) },
           ],
           attachments: [],
           isDeleted: false,
@@ -70,13 +70,13 @@ export class CreateAttachmentsCollectionMigration implements Migration {
           updatedAt: new Date(Date.now() - 3600000),
         },
         {
-          sender: users[1]._id,
-          conversationId: conversations[0]._id,
+          sender: users[1].id,
+          conversation_id: conversations[0].id,
           content: 'I\'m doing great! Just finished the project.',
           type: 'text',
           status: 'read',
           readBy: [
-            { userId: users[0]._id, readAt: new Date(Date.now() - 1800000) },
+            { user_id: users[0].id, readAt: new Date(Date.now() - 1800000) },
           ],
           attachments: [],
           isDeleted: false,
@@ -88,13 +88,13 @@ export class CreateAttachmentsCollectionMigration implements Migration {
       if (conversations.length > 1) {
         messages.push(
           {
-            sender: users[0]._id,
-            conversationId: conversations[1]._id,
+            sender: users[0].id,
+            conversation_id: conversations[1].id,
             content: 'Team, let\'s sync up on the new features',
             type: 'text',
             status: 'delivered',
             readBy: [
-              { userId: users[1]._id, readAt: new Date(Date.now() - 1200000) },
+              { user_id: users[1].id, readAt: new Date(Date.now() - 1200000) },
             ],
             attachments: [],
             isDeleted: false,
@@ -102,8 +102,8 @@ export class CreateAttachmentsCollectionMigration implements Migration {
             updatedAt: new Date(Date.now() - 1800000),
           },
           {
-            sender: users[1]._id,
-            conversationId: conversations[1]._id,
+            sender: users[1].id,
+            conversation_id: conversations[1].id,
             content: 'Sounds good! I\'ll prepare the documentation.',
             type: 'text',
             status: 'sent',

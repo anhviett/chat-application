@@ -90,8 +90,8 @@ export const ChatRoom: React.FC<ChatRoomProps> = ({ conversationId: propConversa
             <h1 className="text-xl font-semibold text-gray-800">Chat Room</h1>
             <p className="text-sm text-gray-500">
               {typingUsers.length > 0
-                ? `${typingUsers.map(u => u.username).join(', ')} đang gõ...`
-                : `${onlineUsers.length} người online`}
+                ? `${typingUsers.map(u => u.username).join(', ')} is typing...`
+                : `${onlineUsers.length} users online`}
             </p>
           </div>
           
@@ -100,10 +100,10 @@ export const ChatRoom: React.FC<ChatRoomProps> = ({ conversationId: propConversa
               className={`w-3 h-3 rounded-full ${
                 isConnected ? 'bg-green-500' : 'bg-red-500'
               }`}
-              title={isConnected ? 'Đã kết nối' : 'Mất kết nối'}
+              title={isConnected ? 'Connected' : 'Disconnected'}
             />
             <span className="text-sm text-gray-600">
-              {isConnected ? 'Đã kết nối' : 'Mất kết nối'}
+              {isConnected ? 'Connected' : 'Disconnected'}
             </span>
           </div>
         </div>
@@ -114,15 +114,15 @@ export const ChatRoom: React.FC<ChatRoomProps> = ({ conversationId: propConversa
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <p className="text-gray-400 text-center">
-              Chưa có tin nhắn nào<br />
-              <span className="text-sm">Hãy bắt đầu cuộc trò chuyện!</span>
+              No messages yet<br />
+              <span className="text-sm">Start the conversation!</span>
             </p>
           </div>
         ) : (
           messages.map((message, index) => {
-            const isCurrentUser = message.sender._id === 'current-user'; // Replace with actual user ID
-            const showAvatar = index === 0 || messages[index - 1].sender._id !== message.sender._id;
-            const isOnline = isUserOnline(message.sender._id);
+            const isCurrentUser = message.sender?._id === 'current-user'; // Replace with actual user ID
+            const showAvatar = index === 0 || messages[index - 1].sender?._id !== message.sender?._id;
+            const isOnline = isUserOnline(message.sender?._id);
 
             return (
               <div
@@ -133,7 +133,7 @@ export const ChatRoom: React.FC<ChatRoomProps> = ({ conversationId: propConversa
                 {!isCurrentUser && showAvatar && (
                   <div className="relative mr-2">
                     <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-semibold">
-                      {message.sender.name.charAt(0).toUpperCase()}
+                      {message.sender?.name.charAt(0).toUpperCase()}
                     </div>
                     {isOnline && (
                       <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
@@ -155,7 +155,7 @@ export const ChatRoom: React.FC<ChatRoomProps> = ({ conversationId: propConversa
                   {/* Sender name (only for others) */}
                   {!isCurrentUser && showAvatar && (
                     <p className="text-xs font-semibold text-gray-600 mb-1">
-                      {message.sender.name}
+                      {message.sender?.name}
                     </p>
                   )}
 
@@ -196,7 +196,7 @@ export const ChatRoom: React.FC<ChatRoomProps> = ({ conversationId: propConversa
               <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
             </div>
             <span className="text-sm text-gray-500">
-              {typingUsers[0].username} đang gõ...
+              {typingUsers[0].username} is typing...
             </span>
           </div>
         )}

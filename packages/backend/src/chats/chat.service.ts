@@ -10,14 +10,14 @@ export class ChatService {
   constructor(
     @InjectModel(Message.name) private messageModel: Model<Message>,
     @InjectModel(Conversation.name) private conversationModel: Model<Conversation>,
-  ) {}
+  ) { }
 
   // Create a new conversation
   async createConversation(userId: string, dto: CreateConversationDto) {
     console.log('Creating conversation with DTO:', dto);
     const userObjectId = new Types.ObjectId(userId);
     const participantObjectIds = dto.participants.map(p => new Types.ObjectId(p));
-    
+
     // For direct conversations, check if one already exists
     if (dto.type === ConversationType.DIRECT) {
       const allParticipants = [userObjectId, ...participantObjectIds];
@@ -40,7 +40,7 @@ export class ChatService {
       description: dto.description,
       participantMetadata: new Map(
         [userId, ...dto.participants].map(p => [
-          p,
+          p.toString(),
           {
             unreadCount: 0,
             lastReadAt: new Date(),
@@ -57,14 +57,24 @@ export class ChatService {
   // Get user conversations
   async getUserConversations(userId: string) {
     const objectId = new Types.ObjectId(userId);
-    return await this.conversationModel
+    const conversations = await this.conversationModel
       .find({
         participants: objectId,
         isArchived: false,
       })
-      .populate('participants', 'name username avatar')
+      .populate('participants', 'firstName lastName avatar')
       .sort({ createdAt: -1 })
+      .lean()
       .exec();
+
+    return conversations.map(conversation => {
+      return {
+        ...conversation,
+        id: conversation._id,
+        _id: conversation._id,
+      };
+    });
+
   }
 
   // Get conversation by ID
@@ -76,7 +86,7 @@ export class ChatService {
         _id: conversationObjectId,
         participants: userObjectId,
       })
-      .populate('participants', 'name username avatar')
+      .populate('participants', 'firstName lastName avatar')
       .exec();
 
     if (!conversation) {
@@ -89,8 +99,8 @@ export class ChatService {
   // Send a message
   async sendMessage(userId: string, dto: SendMessageDto) {
     const userObjectId = new Types.ObjectId(userId);
-    const conversationObjectId = new Types.ObjectId(dto.conversationId);
-    
+    const conversationObjectId = new Types.ObjectId(dto.conversation_id);
+
     // Verify user is participant
     const conversation = await this.conversationModel.findOne({
       _id: conversationObjectId,
@@ -103,7 +113,7 @@ export class ChatService {
 
     const message = new this.messageModel({
       sender: userObjectId,
-      conversationId: conversationObjectId,
+      conversation_id: conversationObjectId,
       content: dto.content,
       type: dto.type,
       status: MessageStatus.SENT,
@@ -113,14 +123,14 @@ export class ChatService {
 
     await message.save();
 
-    return await message.populate('sender', 'name username avatar');
+    return await message.populate('sender', 'firstName lastName avatar');
   }
 
   // Get messages for a conversation
   async getMessages(conversationId: string, userId: string, limit = 50, before?: string) {
     const conversationObjectId = new Types.ObjectId(conversationId);
     const userObjectId = new Types.ObjectId(userId);
-    
+
     // Verify user is participant
     const conversation = await this.conversationModel.findOne({
       _id: conversationObjectId,
@@ -132,7 +142,7 @@ export class ChatService {
     }
 
     const query: any = {
-      conversationId: conversationObjectId,
+      conversation_id: conversationObjectId,
       isDeleted: false,
     };
 
@@ -142,7 +152,7 @@ export class ChatService {
 
     return await this.messageModel
       .find(query)
-      .populate('sender', 'name username avatar')
+      .populate('sender', 'firstName lastName avatar')
       .sort({ createdAt: -1 })
       .limit(limit)
       .exec();
@@ -153,10 +163,10 @@ export class ChatService {
     const messageObjectId = new Types.ObjectId(messageId);
     const conversationObjectId = new Types.ObjectId(conversationId);
     const userObjectId = new Types.ObjectId(userId);
-    
+
     const message = await this.messageModel.findOne({
       _id: messageObjectId,
-      conversationId: conversationObjectId,
+      conversation_id: conversationObjectId,
     });
 
     if (!message) {
@@ -164,10 +174,10 @@ export class ChatService {
     }
 
     // Check if already read by user
-    const alreadyRead = message.readBy.some((r) => r.userId.toString() === userId);
+    const alreadyRead = message.readBy.some((r) => r.user_id.toString() === userId);
     if (!alreadyRead) {
       message.readBy.push({
-        userId: userObjectId,
+        user_id: userObjectId,
         readAt: new Date(),
       });
       message.status = MessageStatus.READ;
@@ -187,10 +197,10 @@ export class ChatService {
   async markConversationAsRead(conversationId: string, userId: string) {
     const conversationObjectId = new Types.ObjectId(conversationId);
     const userObjectId = new Types.ObjectId(userId);
-    
+
     // Get all unread messages
     const messages = await this.messageModel.find({
-      conversationId: conversationObjectId,
+      conversation_id: conversationObjectId,
       'readBy.userId': { $ne: userObjectId },
       sender: { $ne: userObjectId },
     });
@@ -198,7 +208,7 @@ export class ChatService {
     // Mark all as read
     for (const message of messages) {
       message.readBy.push({
-        userId: userObjectId,
+        user_id: userObjectId,
         readAt: new Date(),
       });
       message.status = MessageStatus.READ;
@@ -216,7 +226,7 @@ export class ChatService {
   async deleteMessage(messageId: string, userId: string) {
     const messageObjectId = new Types.ObjectId(messageId);
     const userObjectId = new Types.ObjectId(userId);
-    
+
     const message = await this.messageModel.findOne({
       _id: messageObjectId,
       sender: userObjectId,
@@ -238,7 +248,7 @@ export class ChatService {
     const conversationObjectId = new Types.ObjectId(conversationId);
     const userObjectId = new Types.ObjectId(userId);
     const participantObjectIds = newParticipants.map(p => new Types.ObjectId(p));
-    
+
     const conversation = await this.conversationModel.findOne({
       _id: conversationObjectId,
       type: { $in: [ConversationType.GROUP, ConversationType.CHANNEL] },
@@ -259,7 +269,7 @@ export class ChatService {
     const conversationObjectId = new Types.ObjectId(conversationId);
     const userObjectId = new Types.ObjectId(userId);
     const participantObjectId = new Types.ObjectId(participantToRemove);
-    
+
     const conversation = await this.conversationModel.findOne({
       _id: conversationObjectId,
       type: { $in: [ConversationType.GROUP, ConversationType.CHANNEL] },
@@ -279,7 +289,7 @@ export class ChatService {
   async leaveConversation(conversationId: string, userId: string) {
     const conversationObjectId = new Types.ObjectId(conversationId);
     const userObjectId = new Types.ObjectId(userId);
-    
+
     await this.conversationModel.findByIdAndUpdate(conversationObjectId, {
       $pull: { participants: userObjectId, admins: userObjectId },
     });

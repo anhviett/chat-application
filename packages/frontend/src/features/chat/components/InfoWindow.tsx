@@ -1,28 +1,34 @@
 import Button from '@/common/components/Button';
 import { useAuth } from '@/contexts/AuthContext';
-import { ChatThread } from '@/types/message-type';
 import { useState } from 'react';
-
+import { useSelector } from 'react-redux';
+import { RootState } from '@/stores/chat-app.store';
+import { setInfoWindowOpen } from '@/stores/slices/chatUiSlice';
+import { useAppDispatch } from '@/stores/hooks';
 type TabKey = 'profile' | 'media' | 'links' | 'settings';
 
-type InfoWindowProps = {
-    chatThread?: ChatThread;
-    onClose?: () => void;
-}
-
-const InfoWindow = ({ chatThread, onClose }: InfoWindowProps) => {
+const InfoWindow = () => {
     const [activeTab,] = useState<TabKey>('profile');
     const { user: currentUser } = useAuth();
-    console.log('user: ', currentUser);
+    const dispatch = useAppDispatch();
+    const chatThread = useSelector((state: RootState) => state.chatUi.chatThread);
 
     return (
         chatThread && (
             <div className="h-full bg-backgroundSidebar">
                 <div className="sticky top-0 z-10 bg-backgroundSidebar border-b border-gray-2 py-2.5">
                     <div className="px-4 py-3 flex items-center justify-between h-full">
+                        {/* Back button - chỉ hiển thị trên mobile */}
+                        <button 
+                            type="button" 
+                            onClick={() => dispatch(setInfoWindowOpen(false))}
+                            className="lg:hidden mr-3 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                            <i className="fa-solid fa-arrow-left text-gray-600"></i>
+                        </button>
                         <h5 className="text-black font-bold text-xl w-full flex items-center justify-between">
                             Contact Info
-                            <Button className="text-gray-1 hover:bg-red-1 hover:text-white flex items-center justify-center h-6 w-6 rounded-full" onClick={onClose}>
+                            <Button className="hidden lg:flex text-gray-1 hover:bg-red-1 hover:text-white items-center justify-center h-6 w-6 rounded-full" onClick={() => dispatch(setInfoWindowOpen(false))}>
                                 <i className="fa-solid fa-xmark text-sm"></i>
                             </Button>
                         </h5>

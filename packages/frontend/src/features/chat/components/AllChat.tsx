@@ -2,17 +2,20 @@ import React from "react";
 import { useTyping } from "@/contexts/TypingContext";
 import { useUserList } from "@/common/hooks/useUserList";
 import { ChatThread } from "@/types/message-type";
-import { Conversation } from "@/types/conversation-type";
 import { useConversations } from "@/common/hooks/useConversations";
+import { setChatThread } from "@/stores/slices/chatUiSlice";
+
 type AllChatProps = {
     onSelectChat: (chatThread: ChatThread) => void;
 };
 
-const AllChat: React.FC<AllChatProps> = ({ onSelectChat }) => {
+const AllChat = () => {
+    const onSelectChat = setChatThread;
     const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
     const { typingUsers } = useTyping();
     const { users } = useUserList();
     const { conversations, fetchConversation } = useConversations();
+    console.log('conversations: ', conversations);
     
     const handleSelectChat = async (user: { _id: string; name: string }) => {
         await fetchConversation(user._id);

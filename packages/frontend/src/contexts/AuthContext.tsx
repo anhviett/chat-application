@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import type { AuthContextType } from '@/types/auth-context';
 import type { UserType } from '@/types/user-type';
+import { useAppDispatch } from '@/stores/hooks';
+import { setCredentials, clearAuth, setAccessToken as setStoreAccessToken, initializeAuth } from '@/stores/slices/authSlice';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -8,6 +10,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<UserType | null>(null);
     const [accessToken, setAccessToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const dispatch = useAppDispatch();
 
     const logout = () => {
         localStorage.removeItem('accessToken');
@@ -15,6 +18,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem('user');
         setAccessToken(null);
         setUser(null);
+        dispatch(clearAuth()); // Clear Redux store
         window.location.href = '/login'; // redirect to login page
     }
 
@@ -31,12 +35,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 console.log('✅ Loaded from cache');
             }
             
+            // Initialize Redux store from localStorage
+            dispatch(initializeAuth());
+            
             // Set loading = false immediately
             setLoading(false);
         };
 
         initAuth();
-    }, []);
+    }, [dispatch]);
 
     const login = (token: string, refreshToken: string, userData: UserType) => {
         localStorage.setItem('accessToken', token);
@@ -45,6 +52,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         setAccessToken(token);
         setUser(userData);
+        
+        // Save to Redux store
+        dispatch(setCredentials({
+            user: userData,
+            accessToken: token,
+            refreshToken: refreshToken,
+        }));
     }
 
     const refreshAccessToken = async (): Promise<string> => {
@@ -59,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const newMockToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ id: 1, name: 'test', exp: expirationTime }))}.mock-signature`;
             localStorage.setItem('accessToken', newMockToken);
             setAccessToken(newMockToken);
+            dispatch(setStoreAccessToken(newMockToken)); // Update Redux store
             return newMockToken;
         }
 
@@ -81,6 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             // Update localStorage and state
             localStorage.setItem('accessToken', data.accessToken);
             setAccessToken(data.accessToken);
+            dispatch(setStoreAccessToken(data.accessToken)); // Update Redux store
             
             // Optionally update refresh token if provided
             if (data.refreshToken) {

@@ -7,6 +7,9 @@ import { ChatModule } from './chats/chat.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { SocketGateway } from './socket/socket.gateway';
+import { GeminiController } from './gemini/gemini.controller';
+import { GeminiService } from './gemini/gemini.service';
+import { GeminiModule } from './gemini/gemini.module';
 
 dotenv.config();
 
@@ -25,6 +28,7 @@ console.log(
     AuthModule,
     ChatModule,
     UsersModule,
+    GeminiModule,
   ],
   controllers: [AppController],
   providers: [AppService, SocketGateway],

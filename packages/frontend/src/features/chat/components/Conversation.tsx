@@ -3,19 +3,28 @@ import { useTyping } from '@/contexts/TypingContext';
 import { useChat } from '@/common/hooks/useChat';
 import { useAuth } from '@/contexts/AuthContext';
 import { ChatThread } from '@/types/message-type';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/stores/chat-app.store';
+import { useAppDispatch } from '@/app/hooks';
+import { backToList, toggleInfoWindow } from '@/stores/slices/chatUiSlice';
 
 type ConversationProps = {
     chatThread?: ChatThread;
     onContactInfoToggle?: (isOpen: boolean) => void; // callback to notify parent component
+    onBack?: () => void; // callback to go back on mobile
 }
 
-const Conversation: React.FC<ConversationProps> = ({ chatThread, onContactInfoToggle }) => {
+const Conversation: React.FC<ConversationProps> = () => {
     const [showContactInfo, setShowContactInfo] = useState(false);
     const [message, setMessage] = useState('');
     const { setUserTyping } = useTyping();
     const { user } = useAuth();
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    
+    const chatThread = useSelector((state: RootState) => state.chatUi.chatThread);
+    const dispatch = useAppDispatch();
+    const onContactInfoToggle = () => dispatch(toggleInfoWindow());
+    const onBack = () => dispatch(backToList());
+
     // Use chat hook to handle messages
     const { sendMessage, messages } = useChat({
         conversationId: chatThread?.conversationId,
@@ -69,6 +78,14 @@ const Conversation: React.FC<ConversationProps> = ({ chatThread, onContactInfoTo
         <div className="flex flex-col h-full relative bg-white">
             <div className="sticky top-0 z-10 bg-white flex items-center justify-between px-4 py-3 border-b border-gray-2 shadow-[0_1px_5px_1px_#f3f3f3]">
                 <div className="flex items-center">
+                    {/* Back button - chỉ hiển thị trên mobile */}
+                    <button 
+                        type="button" 
+                        onClick={onBack}
+                        className="lg:hidden mr-3 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+                    >
+                        <i className="fa-solid fa-arrow-left text-gray-600"></i>
+                    </button>
                     <img className="w-10 h-10 rounded-full mr-3" src="https://dreamschat.dreamstechnologies.com/react/template/assets/img/profiles/avatar-15.jpg" alt="Avatar" />
                     <div>
                         <p className="text-white font-semibold leading-tight">

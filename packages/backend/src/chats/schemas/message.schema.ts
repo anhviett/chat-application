@@ -16,7 +16,7 @@ export class Message {
   sender: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'Conversation', required: true })
-  conversationId: Types.ObjectId;
+  conversation_id: Types.ObjectId;
 
   @Prop({ required: true })
   content: string;
@@ -27,8 +27,8 @@ export class Message {
   @Prop({ type: String, enum: MessageStatus, default: MessageStatus.SENT })
   status: MessageStatus;
 
-  @Prop({ type: [{ userId: Types.ObjectId, readAt: Date }], default: [] })
-  readBy: Array<{ userId: Types.ObjectId; readAt: Date }>;
+  @Prop({ type: [{ user_id: Types.ObjectId, readAt: Date }], default: [] })
+  readBy: Array<{ user_id: Types.ObjectId; readAt: Date }>;
 
   @Prop({ type: [String], default: [] })
   attachments: string[];
@@ -46,5 +46,5 @@ export class Message {
 export const MessageSchema = SchemaFactory.createForClass(Message);
 
 // Indexes for performance
-MessageSchema.index({ conversationId: 1, createdAt: -1 });
+MessageSchema.index({ conversation_id: 1, createdAt: -1 });
 MessageSchema.index({ sender: 1 });

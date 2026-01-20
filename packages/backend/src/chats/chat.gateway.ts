@@ -54,7 +54,6 @@ interface AuthenticatedSocket extends Socket {
     user: {
       sub: string;       // user ID (subject trong JWT token)
       email: string;     // email của user
-      username?: string; // username (optional - có thể có hoặc không)
     };
   };
 }
@@ -165,7 +164,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       // chỉ những socket trong room đó mới nhận được
       conversations.forEach((conv) => {
         // Join room với tên pattern: "conversation:${conversationId}"
-        client.join(`conversation:${conv._id}`);
+        client.join(`conversation:${conv.id}`);
       });
 
       // ============================================
@@ -284,13 +283,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.getUserSockets(participantId).forEach((socketId) => {
           // Lấy socket instance từ socketId
           // '?.' để tránh lỗi nếu socket không tồn tại
-          this.server.sockets.sockets.get(socketId)?.join(`conversation:${conversation._id}`);
+          this.server.sockets.sockets.get(socketId)?.join(`conversation:${conversation.id}`);
         });
       });
 
       // Gửi event 'conversationCreated' tới TẤT CẢ users trong room này
       // 'to()' chỉ định room, 'emit()' gửi event
-      this.server.to(`conversation:${conversation._id}`).emit('conversationCreated', conversation);
+      this.server.to(`conversation:${conversation.id}`).emit('conversationCreated', conversation);
 
       // Return response về client (optional)
       // Client có thể lắng nghe response này nếu cần
@@ -311,12 +310,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const userId = client.data.user.sub;
       
       // Verify user has access to this conversation
-      await this.chatService.getConversation(dto.conversationId, userId);
+      await this.chatService.getConversation(dto.conversation_id, userId);
       
-      client.join(`conversation:${dto.conversationId}`);
-      this.logger.log(`User ${userId} joined room ${dto.conversationId}`);
+      client.join(`conversation:${dto.conversation_id}`);
+      this.logger.log(`User ${userId} joined room ${dto.conversation_id}`);
 
-      return { success: true, conversationId: dto.conversationId };
+      return { success: true, conversation_id: dto.conversation_id };
     } catch (error) {
       throw new WsException(error.message);
     }
@@ -338,7 +337,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const message = await this.chatService.sendMessage(userId, dto);
 
       // Dừng typing indicator của user này (vì đã gửi message rồi)
-      this.handleStopTyping(client, { conversationId: dto.conversationId });
+      this.handleStopTyping(client, { conversation_id: dto.conversation_id });
 
       // ============================================
       // BROADCAST MESSAGE TỚI TẤT CẢ USERS TRONG CONVERSATION
@@ -346,9 +345,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       // 'to()' chỉ định room cần gửi
       // 'emit()' gửi event với data
       // Tất cả socket trong room này sẽ nhận được event 'newMessage'
-      this.server.to(`conversation:${dto.conversationId}`).emit('newMessage', {
+      this.server.to(`conversation:${dto.conversation_id}`).emit('newMessage', {
         message,
-        conversationId: dto.conversationId,
+        conversation_id: dto.conversation_id,
       });
 
       // ============================================
@@ -357,8 +356,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       // 'client.emit' chỉ gửi tới client này (không gửi broadcast)
       // Client có thể dùng tempId để update optimistic message
       client.emit('messageSent', {
-        tempId: dto['tempId'], // tempId do client tự tạo khi gửi
-        messageId: message._id, // messageId thật từ database
+        temp_id: dto['tempId'], // tempId do client tự tạo khi gửi
+        message_id: message.id, // messageId thật từ database
       });
 
       return { success: true, message };
@@ -380,24 +379,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const userId = client.data.user.sub;
 
       // Kiểm tra xem conversation này đã có trong Map chưa
-      if (!this.typingUsers.has(dto.conversationId)) {
+      if (!this.typingUsers.has(dto.conversation_id)) {
         // Nếu chưa, tạo Set mới
-        this.typingUsers.set(dto.conversationId, new Set());
+        this.typingUsers.set(dto.conversation_id, new Set());
       }
       
       // Thêm userId vào Set của conversation này
       // '!' là non-null assertion vì ta vừa set ở trên
-      this.typingUsers.get(dto.conversationId)!.add(userId);
+      this.typingUsers.get(dto.conversation_id)!.add(userId);
 
       // ============================================
       // BROADCAST TYPING EVENT
       // ============================================
       // 'client.to()' gửi tới TẤT CẢ trong room NGOẠI TRỪ client này
       // Vì client đang gõ thì không cần nhận event của chính mình
-      client.to(`conversation:${dto.conversationId}`).emit('userTyping', {
+      client.to(`conversation:${dto.conversation_id}`).emit('userTyping', {
         userId,
-        conversationId: dto.conversationId,
-        username: client.data.user.username || client.data.user.email,
+        conversation_id: dto.conversation_id,
+        email: client.data.user.email,
       });
 
       return { success: true };
@@ -415,14 +414,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     try {
       const userId = client.data.user.sub;
 
-      const typingSet = this.typingUsers.get(dto.conversationId);
+      const typingSet = this.typingUsers.get(dto.conversation_id);
       if (typingSet) {
         typingSet.delete(userId);
       }
 
-      client.to(`conversation:${dto.conversationId}`).emit('userStoppedTyping', {
+      client.to(`conversation:${dto.conversation_id}`).emit('userStoppedTyping', {
         userId,
-        conversationId: dto.conversationId,
+        conversation_id: dto.conversation_id,
       });
 
       return { success: true };
@@ -439,12 +438,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     try {
       const userId = client.data.user.sub;
-      await this.chatService.markAsRead(dto.conversationId, dto.messageId, userId);
+      await this.chatService.markAsRead(dto.conversation_id, dto.message_id, userId);
 
       // Notify sender that message was read
-      this.server.to(`conversation:${dto.conversationId}`).emit('messageRead', {
-        messageId: dto.messageId,
-        conversationId: dto.conversationId,
+      this.server.to(`conversation:${dto.conversation_id}`).emit('messageRead', {
+        message_id: dto.message_id,
+        conversation_id: dto.conversation_id,
         readBy: userId,
         readAt: new Date(),
       });
@@ -463,10 +462,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     try {
       const userId = client.data.user.sub;
-      await this.chatService.markConversationAsRead(dto.conversationId, userId);
+      await this.chatService.markConversationAsRead(dto.conversation_id, userId);
 
-      this.server.to(`conversation:${dto.conversationId}`).emit('conversationRead', {
-        conversationId: dto.conversationId,
+      this.server.to(`conversation:${dto.conversation_id}`).emit('conversationRead', {
+        conversation_id: dto.conversation_id,
         readBy: userId,
         readAt: new Date(),
       });

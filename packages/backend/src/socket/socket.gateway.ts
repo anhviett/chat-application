@@ -44,7 +44,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const userId = payload.userId;
       // Lưu message vào database
       const savedMessage = await this.chatService.sendMessage(userId, {
-        conversationId: payload.conversationId,
+        conversation_id: payload.conversationId,
         content: payload.content,
         type: payload.type,
         attachments: payload.attachments,
@@ -68,13 +68,13 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('userTyping')
   handleUserTyping(@ConnectedSocket() client: Socket, @MessageBody() payload: any): void {
     console.log(`[SocketGateway] userTyping from ${client.id}:`, payload);
-    client.broadcast.emit('userTyping', { userId: client.id, ...payload });
+    client.broadcast.emit('userTyping', { user_id: client.id, ...payload });
   }
 
   @SubscribeMessage('userStoppedTyping')
   handleUserStoppedTyping(@ConnectedSocket() client: Socket, @MessageBody() payload: any): void {
     console.log(`[SocketGateway] userStoppedTyping from ${client.id}:`, payload);
-    client.broadcast.emit('userStoppedTyping', { userId: client.id, ...payload });
+    client.broadcast.emit('userStoppedTyping', { user_id: client.id, ...payload });
   }
 
   // 3. React request online users
@@ -89,7 +89,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('markMessageRead')
   handleMarkMessageRead(@ConnectedSocket() client: Socket, @MessageBody() payload: any): void {
     console.log(`[SocketGateway] markMessageRead from ${client.id}:`, payload);
-    client.broadcast.emit('messageRead', { userId: client.id, ...payload });
+    client.broadcast.emit('messageRead', { user_id: client.id, ...payload });
   }
 }
 

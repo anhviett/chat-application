@@ -119,12 +119,12 @@ class DatabaseSeeder {
 
     // Get some interests to reference
     const interests = await interestsCollection.find().limit(3).toArray();
-    const interestIds = interests.map(i => i._id);
+    const interestIds = interests.map(i => i.id);
 
     const users = [
       {
-        name: 'Alice Johnson',
-        username: 'alice_johnson',
+        firstName: 'Alice',
+        lastName: 'Johnson',
         email: 'alice@example.com',
         password: '$2b$10$hashedpassword1',
         about: 'Software developer passionate about web technologies',
@@ -132,13 +132,13 @@ class DatabaseSeeder {
         height: 165,
         weight: 60,
         gender: 'female',
-        interests: [interestIds[0], interestIds[1]],
+        interests: [],
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        name: 'Bob Smith',
-        username: 'bob_smith',
+        firstName: 'Bob',
+        lastName: 'Smith',
         email: 'bob@example.com',
         password: '$2b$10$hashedpassword2',
         about: 'Designer and creative thinker',
@@ -146,13 +146,13 @@ class DatabaseSeeder {
         height: 180,
         weight: 75,
         gender: 'male',
-        interests: [interestIds[1], interestIds[2]],
+        interests: [],
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        name: 'Carol Williams',
-        username: 'carol_williams',
+        firstName: 'Carol',
+        lastName: 'Williams',
         email: 'carol@example.com',
         password: '$2b$10$hashedpassword3',
         about: 'Marketing specialist and travel enthusiast',
@@ -160,7 +160,7 @@ class DatabaseSeeder {
         height: 170,
         weight: 65,
         gender: 'female',
-        interests: [interestIds[0], interestIds[2]],
+        interests: [],
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -191,14 +191,14 @@ class DatabaseSeeder {
     const conversations = [
       {
         type: 'direct',
-        participants: [users[0]._id, users[1]._id],
-        createdBy: users[0]._id,
+        participants: [users[0].id, users[1].id],
+        createdBy: users[0].id,
         participantMetadata: {
-          [users[0]._id.toString()]: {
+          [users[0].id.toString()]: {
             unreadCount: 0,
             lastReadAt: new Date(),
           },
-          [users[1]._id.toString()]: {
+          [users[1].id.toString()]: {
             unreadCount: 2,
             lastReadAt: new Date(Date.now() - 3600000),
           },
@@ -210,25 +210,25 @@ class DatabaseSeeder {
       {
         type: 'group',
         name: 'Development Team',
-        participants: [users[0]._id, users[1]._id, users[2]._id],
-        createdBy: users[0]._id,
+        participants: [users[0].id, users[1].id, users[2].id],
+        createdBy: users[0].id,
         description: 'Group for development team discussions',
         avatar: 'https://example.com/avatar.jpg',
         participantMetadata: {
-          [users[0]._id.toString()]: {
+          [users[0].id.toString()]: {
             unreadCount: 0,
             lastReadAt: new Date(),
           },
-          [users[1]._id.toString()]: {
+          [users[1].id.toString()]: {
             unreadCount: 1,
             lastReadAt: new Date(Date.now() - 1800000),
           },
-          [users[2]._id.toString()]: {
+          [users[2].id.toString()]: {
             unreadCount: 3,
             lastReadAt: new Date(Date.now() - 7200000),
           },
         },
-        admins: [users[0]._id],
+        admins: [users[0].id],
         isArchived: false,
         settings: {
           allowMemberToInvite: true,
@@ -266,13 +266,13 @@ class DatabaseSeeder {
 
     const messages = [
       {
-        sender: users[0]._id,
-        conversationId: conversations[0]._id,
+        sender: users[0].id,
+        conversation_id: conversations[0].id,
         content: 'Hey! How are you doing?',
         type: 'text',
         status: 'read',
         readBy: [
-          { userId: users[1]._id, readAt: new Date(Date.now() - 1800000) },
+          { user_id: users[1].id, readAt: new Date(Date.now() - 1800000) },
         ],
         attachments: [],
         isDeleted: false,
@@ -280,13 +280,13 @@ class DatabaseSeeder {
         updatedAt: new Date(Date.now() - 3600000),
       },
       {
-        sender: users[1]._id,
-        conversationId: conversations[0]._id,
+        sender: users[1].id,
+        conversation_id: conversations[0].id,
         content: 'I\'m doing great! Just finished the project.',
         type: 'text',
         status: 'read',
         readBy: [
-          { userId: users[0]._id, readAt: new Date(Date.now() - 1800000) },
+          { user_id: users[0].id, readAt: new Date(Date.now() - 1800000) },
         ],
         attachments: [],
         isDeleted: false,
@@ -294,13 +294,13 @@ class DatabaseSeeder {
         updatedAt: new Date(Date.now() - 3000000),
       },
       {
-        sender: users[0]._id,
-        conversationId: conversations[1]._id,
+        sender: users[0].id,
+        conversation_id: conversations[1].id,
         content: 'Team, let\'s sync up on the new features',
         type: 'text',
         status: 'delivered',
         readBy: [
-          { userId: users[1]._id, readAt: new Date(Date.now() - 1200000) },
+          { user_id: users[1].id, readAt: new Date(Date.now() - 1200000) },
         ],
         attachments: [],
         isDeleted: false,
@@ -308,8 +308,8 @@ class DatabaseSeeder {
         updatedAt: new Date(Date.now() - 1800000),
       },
       {
-        sender: users[1]._id,
-        conversationId: conversations[1]._id,
+        sender: users[1].id,
+        conversation_id: conversations[1].id,
         content: 'Sounds good! I\'ll prepare the documentation.',
         type: 'text',
         status: 'sent',
