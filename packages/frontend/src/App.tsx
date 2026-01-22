@@ -95,14 +95,11 @@ const MainLayout = () => {
               Mobile: Full width khi có chatThread, ẩn khi không có
               Desktop: Flex-1 để chiếm phần còn lại
             */}
-            <div className={`h-full flex-1 min-w-0
-              ${!chatThread ? 'hidden lg:block' : 'w-full lg:w-auto'}
-              ${isInfoWindowOpen ? 'hidden lg:block' : ''}
-            `}>
+            <div className={`h-full flex-1 min-w-0 ${!chatThread ? 'hidden lg:block' : 'w-full lg:w-auto'} ${isInfoWindowOpen ? 'hidden lg:block' : ''}`}>
               {chatThread ? (
                 <Conversation/>
               ) : (
-                <ChatDefault className="hidden lg:flex" />
+                <ChatDefault />
               )}
             </div>
 

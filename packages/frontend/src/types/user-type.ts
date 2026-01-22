@@ -5,7 +5,7 @@ export interface UserType {
     firstName?: string;
     lastName?: string;
     gender?: string;
-    image?: string;
+    avatar?: string;
     name?: string;
     about?: string;
     interests?: string[];

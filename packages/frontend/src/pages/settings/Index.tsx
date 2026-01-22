@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import AccordionItem from '@/common/components/AccordionItem';
+import HeaderSection from '@/common/components/HeaderSection';
 
 const Setting = () => {
     const [openItem, setOpenItem] = useState<number | null>(1);
@@ -10,15 +11,7 @@ const Setting = () => {
     
     return (
         <div className="chat-search-header relative mb-4">
-            <h4 className="font-bold text-xl text-black">Settings</h4>
-            <div className="flex items-center ml-2">
-                <div className="w-6 h-6 rounded-full bg-violet-600 flex items-center justify-center cursor-pointer mr-3">
-                    <i className="fa-solid fa-plus text-sm text-white"></i>
-                </div>
-                <div className="cursor-pointer">
-                    <i className="fal fa-solid fa-ellipsis-vertical text-gray-1 text-sm"></i>
-                </div>
-            </div>
+            <HeaderSection title="Settings" />
             <h4 className="font-bold text-xl text-black mt-4">Account Settings</h4>
             <div className="bg-gray-100 min-h-screen w-full flex justify-center pt-10">
                 <div className="container mx-auto px-4 max-w-4xl">

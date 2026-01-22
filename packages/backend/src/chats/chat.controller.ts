@@ -30,10 +30,12 @@ import {
 } from './dto/chat.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ClassSerializerInterceptor } from '@nestjs/common';
+import { UsersService } from 'src/users/users.service';
 
 @Controller('chats')
 export class ChatController {
-  constructor(private readonly chatService: ChatService) {}
+  constructor(private readonly chatService: ChatService) {
+  }
 
   // ============ CONVERSATION ENDPOINTS ============
 
@@ -43,11 +45,14 @@ export class ChatController {
     return this.chatService.createConversation(userId, dto);
   }
 
-  @UseGuards(JwtAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('conversations')
   async getUserConversations(@Request() req: any) {
-    const userId = req.user?.id;
+    const userId = req.user?.id || null;
+    if (!userId) {
+      // return this.chatService.findAll();
+      return [];
+    }
     return this.chatService.getUserConversations(userId);
   }
 

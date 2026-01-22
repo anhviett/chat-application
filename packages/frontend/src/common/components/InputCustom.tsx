@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { InputCustom as InputCustomProps } from '@/types/input';
 
 
-const InputCustom = ({ type, value, name, id, placeholder, className, required, onChange }: InputCustomProps) => {
+const InputCustom = ({ type, value, name, id, placeholder, className, required, disabled, onChange, onKeyDown }: InputCustomProps) => {
     const [inputValue, setInputValue] = useState(value || '');
     
     useEffect(() => {
@@ -15,16 +15,22 @@ const InputCustom = ({ type, value, name, id, placeholder, className, required, 
         onChange?.(e);
     };
 
+    const handleOnKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        onKeyDown?.(e);
+    };
+
     return (
         <input 
+            id={id}
+            name={name}
             type={type}
             value={inputValue}
-            onChange={handleOnChange}
             placeholder={placeholder}
             className={className}
             required={required}
-            id={id}
-            name={name}
+            disabled={disabled}
+            onChange={handleOnChange}
+            onKeyDown={handleOnKeyDown}
         />
     );
 }

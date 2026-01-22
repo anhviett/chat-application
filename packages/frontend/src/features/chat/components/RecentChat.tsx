@@ -1,8 +1,10 @@
+import { useUserList } from "@/common/hooks/useUserList";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/swiper-bundle.css';
 import './style.css'
 
 const RecentChat = () => {
+    const { users } = useUserList();
     const slideData = [
       { id: 1, name: 'John Doe', avatar: 'https://i.pravatar.cc/150?img=1' },
       { id: 2, name: 'Jane Smith', avatar: 'https://i.pravatar.cc/150?img=2' },
@@ -25,7 +27,7 @@ const RecentChat = () => {
                     watchSlidesProgress={true}
                     className='online-contact-slider'
                 >
-                    {slideData.map((slide) => (
+                    {users.map((slide) => (
                         <SwiperSlide key={slide.id} style={{ width: 'auto' }}>
                             <div className="flex flex-col">
                                 <div className="text-center size-12 relative before:content-[''] before:absolute before:bg-active before:size-3 before:rounded-full before:right-0 before:bottom-0 before:border-2 before:border-white">

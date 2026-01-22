@@ -6,5 +6,7 @@ export interface InputCustom {
     required?: boolean;
     id?: string;
     name?: string;
+    disabled?: boolean;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }

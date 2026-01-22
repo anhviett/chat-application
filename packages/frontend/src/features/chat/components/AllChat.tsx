@@ -15,7 +15,6 @@ const AllChat = () => {
     const { typingUsers } = useTyping();
     const { users } = useUserList();
     const { conversations, fetchConversation } = useConversations();
-    console.log('conversations: ', conversations);
     
     const handleSelectChat = async (user: { _id: string; name: string }) => {
         await fetchConversation(user._id);
