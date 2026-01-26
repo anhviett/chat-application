@@ -31,6 +31,7 @@ import {
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ClassSerializerInterceptor } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
+import { ConversationType } from '../common/enums/conversation-type.enum';
 
 @Controller('chats')
 export class ChatController {
@@ -57,10 +58,9 @@ export class ChatController {
   }
 
   @Get('conversations/:id')
+  @UseGuards(JwtAuthGuard)
   async getConversation(@Request() req, @Param('id') _id: string) {
     const userId = req.user?.id;
-    console.log('id, user_id: ', _id, userId);
-
     return this.chatService.getConversation(_id, userId);
   }
 

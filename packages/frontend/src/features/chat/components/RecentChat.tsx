@@ -2,17 +2,34 @@ import { useUserList } from "@/common/hooks/useUserList";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/swiper-bundle.css';
 import './style.css'
+import AvatarMan from "@/assets/images/avatar-man.png";
+import AvatarFemale from "@/assets/images/avatar-female.webp";
+import { useConversations } from "@/common/hooks/useConversations";
+import { setChatThread } from "@/stores/slices/chatUiSlice";
+import { useDispatch } from 'react-redux';
 
 const RecentChat = () => {
+    const dispatch = useDispatch();
     const { users } = useUserList();
-    const slideData = [
-      { id: 1, name: 'John Doe', avatar: 'https://i.pravatar.cc/150?img=1' },
-      { id: 2, name: 'Jane Smith', avatar: 'https://i.pravatar.cc/150?img=2' },
-      { id: 3, name: 'Sam Wilson', avatar: 'https://i.pravatar.cc/150?img=3' },
-      { id: 4, name: 'Emily Brown', avatar: 'https://i.pravatar.cc/150?img=4' },
-      { id: 5, name: 'Michael Lee', avatar: 'https://i.pravatar.cc/150?img=5' },
-      { id: 6, name: 'Jessica Jones', avatar: 'https://i.pravatar.cc/150?img=6' },
-    ];
+    const { conversations, fetchConversation } = useConversations();
+
+    const handleSelectChat = async (user: { _id: string; name: string }) => {
+        await fetchConversation(user._id);
+        const existingConv = conversations.find(c => c.participantId === user._id || c._id === user._id);
+        if (existingConv) {
+            dispatch(setChatThread({
+                recipientId: user._id,
+                name: user.name,
+                conversationId: existingConv._id || existingConv.id
+            }));
+        } else {
+            dispatch(setChatThread({
+                recipientId: user._id,
+                name: user.name,
+                conversationId: undefined
+            }));
+        }
+    };
 
     return (
         <>
@@ -28,14 +45,16 @@ const RecentChat = () => {
                     className='online-contact-slider'
                 >
                     {users.map((slide) => (
-                        <SwiperSlide key={slide.id} style={{ width: 'auto' }}>
-                            <div className="flex flex-col">
-                                <div className="text-center size-12 relative before:content-[''] before:absolute before:bg-active before:size-3 before:rounded-full before:right-0 before:bottom-0 before:border-2 before:border-white">
-                                    <img src={slide.avatar} alt={slide.name} className="rounded-full mx-auto" />
+                        <SwiperSlide key={slide._id} style={{ width: 'auto' }}>
+                            <div className="flex flex-col"
+                                onClick={() => handleSelectChat({ _id: slide._id, name: slide.name })}
+                            >
+                                <div className="text-center size-12 cursor-pointer relative before:content-[''] before:absolute before:bg-active before:size-3 before:rounded-full before:right-0 before:bottom-0 before:border-2 before:border-white">
+                                    <img src={slide.gender ? AvatarFemale : AvatarMan} alt={`${slide.firstName} ${slide.lastName}`} className="rounded-full mx-auto" />
                                 </div>
-                                <p className="text-sm text-gray-1 mt-2">{slide.name}</p>
+                                <p className="text-sm text-gray-1 mt-2">{slide.firstName} {slide.lastName}</p>
                             </div>
-                            
+
                         </SwiperSlide>
                     ))}
                 </Swiper>

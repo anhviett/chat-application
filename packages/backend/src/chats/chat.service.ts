@@ -14,10 +14,8 @@ export class ChatService {
 
   // Create a new conversation
   async createConversation(userId: string, dto: CreateConversationDto) {
-    console.log('Creating conversation with DTO:', dto);
     const userObjectId = new Types.ObjectId(userId);
     const participantObjectIds = dto.participants.map(p => new Types.ObjectId(p));
-
     // For direct conversations, check if one already exists
     if (dto.type === ConversationType.DIRECT) {
       const allParticipants = [userObjectId, ...participantObjectIds];
@@ -89,31 +87,42 @@ export class ChatService {
       .populate('participants', 'firstName lastName avatar')
       .exec();
 
-    if (!conversation) {
-      throw new NotFoundException('Conversation not found');
-    }
-
-    return conversation;
+    return conversation || null;
   }
 
   // Send a message
   async sendMessage(userId: string, dto: SendMessageDto) {
     const userObjectId = new Types.ObjectId(userId);
-    const conversationObjectId = new Types.ObjectId(dto.conversation_id);
+    let conversation = null;
+    let conversationObjectId = null;
 
-    // Verify user is participant
-    const conversation = await this.conversationModel.findOne({
-      _id: conversationObjectId,
-      participants: userObjectId,
-    });
+    if (dto.conversation_id) {
+      conversationObjectId = new Types.ObjectId(dto.conversation_id);
+      conversation = await this.conversationModel.findOne({
+        _id: conversationObjectId,
+        participants: userObjectId,
+      });
+    }
+
+    // Nếu không có conversation_id, hoặc không tìm thấy, thử tạo mới nếu là DIRECT
+    if (!conversation && dto.type === ConversationType.DIRECT && dto.participants) {
+      conversation = await this.createConversation(userId, {
+        type: ConversationType.DIRECT,
+        participants: dto.participants,
+        name: dto.name,
+        avatar: dto.avatar,
+        description: dto.description,
+        settings: dto.settings,
+      });
+    }
 
     if (!conversation) {
-      throw new ForbiddenException('You are not a participant of this conversation');
+      throw new ForbiddenException('Missing conversation_id or participants/type for new conversation');
     }
 
     const message = new this.messageModel({
       sender: userObjectId,
-      conversation_id: conversationObjectId,
+      conversation_id: conversation._id,
       content: dto.content,
       type: dto.type,
       status: MessageStatus.SENT,

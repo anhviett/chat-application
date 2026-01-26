@@ -25,11 +25,8 @@ export const useAutoRefreshToken = () => {
         // Refresh token trước 5 phút khi hết hạn
         const refreshTime = Math.max(0, timeRemaining - 5 * 60 * 1000);
 
-        console.log(`Token will be refreshed in ${refreshTime / 1000} seconds`);
-
         refreshTimeoutRef.current = setTimeout(async () => {
             try {
-                console.log('Auto-refreshing token...');
                 await refreshAccessToken();
             } catch (error) {
                 console.error('Auto-refresh token failed:', error);

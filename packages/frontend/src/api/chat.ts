@@ -24,7 +24,7 @@ export const chatApi = {
     },
     sendMessage: async function (data: SendMessage, cancel = false) {
         const response = await api.request({
-            url: "/messages",
+            url: "chats/messages",
             method: "POST",
             data: data,
             signal: cancel ? cancelApiObject[this.sendMessage.name].handleRequestCancellation().signal : undefined,

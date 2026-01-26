@@ -2,28 +2,36 @@ import React from "react";
 import { useTyping } from "@/contexts/TypingContext";
 import { useUserList } from "@/common/hooks/useUserList";
 import { ChatThread } from "@/types/message-type";
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '@/stores/chat-app.store';
 import { useConversations } from "@/common/hooks/useConversations";
 import { setChatThread } from "@/stores/slices/chatUiSlice";
 
-type AllChatProps = {
-    onSelectChat: (chatThread: ChatThread) => void;
-};
 
 const AllChat = () => {
-    const onSelectChat = setChatThread;
+    const dispatch = useDispatch();
     const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
     const { typingUsers } = useTyping();
-    const { users } = useUserList();
     const { conversations, fetchConversation } = useConversations();
-    
+    const chatThread = useSelector((state: RootState) => state.chatUi.chatThread);
+
     const handleSelectChat = async (user: { _id: string; name: string }) => {
         await fetchConversation(user._id);
         const existingConv = conversations.find(c => c.participantId === user._id || c._id === user._id);
-        onSelectChat({ 
-            recipientId: user._id, 
-            name: user.name,
-            conversationId: existingConv?._id || existingConv?.id
-        });
+        if (existingConv) {
+            dispatch(setChatThread({
+                recipientId: user._id,
+                name: user.name,
+                conversationId: existingConv._id || existingConv.id
+            }));
+        } else {
+            // Nếu chưa có conversation, vẫn set để show UI gửi tin nhắn đầu tiên
+            dispatch(setChatThread({
+                recipientId: user._id,
+                name: user.name,
+                conversationId: undefined
+            }));
+        }
     };
 
     const toggleDropdown = () => {

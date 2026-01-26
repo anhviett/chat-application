@@ -1,6 +1,8 @@
 import { useRef, } from "react";
 import { UserType } from "@/types/user-type";
 import { useUserList } from "@/common/hooks/useUserList";
+import AvatarMan from "@/assets/images/avatar-man.png";
+import AvatarFemale from "@/assets/images/avatar-female.webp";
 
 const groupUsersByLetter = (users: UserType[]) => {
     const grouped: { [key: string]: UserType[] } = {};
@@ -65,9 +67,10 @@ export default function ListUser() {
                                     className="border-b py-2 px-2 hover:bg-gray-50 transition cursor-pointer"
                                 >
                                     <div className="flex items-center gap-3">
+                                        { user.gender }
                                         <div className="w-10 h-10 rounded-full overflow-hidden bg-blue-500 text-white flex items-center justify-center font-semibold flex-shrink-0">
-                                            {user.image ? (
-                                                <img src={user.image} alt={`${user.firstName} ${user.lastName}`} className="w-full h-full object-cover" />
+                                            {user.gender ? (
+                                                <img src={user.gender ? AvatarFemale : AvatarMan} alt={`${user.firstName} ${user.lastName}`} className="w-full h-full object-cover" />
                                             ) : (
                                                 <span className="text-white">{user.firstName?.[0]}{user.lastName?.[0]}</span>
                                             )}
@@ -88,7 +91,6 @@ export default function ListUser() {
                 ))}
             </div>
 
-            {/* Thanh chữ cái A-Z */}
             <div className="absolute right-0 top-1/2 -translate-y-1/2 flex flex-col items-center pr-1">
                 {letters.map((letter) => (
                     <button

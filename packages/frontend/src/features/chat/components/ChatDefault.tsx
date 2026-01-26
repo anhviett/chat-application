@@ -4,7 +4,6 @@ interface DefaultChatProps {
     className?: string;
 }
 function ChatDefault({ className }: DefaultChatProps) {
-    console.log(window.location.pathname.includes('gemini'));
     return (
         <>
             {window.location.pathname.includes('gemini') ? (

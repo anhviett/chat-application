@@ -9,13 +9,14 @@ import {
   IsDate,
 } from 'class-validator';
 import { MessageType } from '../../common/enums/message-type.enum';
+import { ConversationType } from '../../common/enums/conversation-type.enum';
 
 // ============ CONVERSATION DTOs ============
 
 export class CreateConversationDto {
-  @IsEnum(['direct', 'group', 'channel'])
+  @IsEnum(ConversationType)
   @IsNotEmpty()
-  type: 'direct' | 'group' | 'channel';
+  type: ConversationType;
 
   @IsArray()
   @IsMongoId({ each: true })
@@ -74,10 +75,11 @@ export class AddParticipantsDto {
 
 // ============ MESSAGE DTOs ============
 
+
 export class SendMessageDto {
+  @IsOptional()
   @IsMongoId()
-  @IsNotEmpty()
-  conversation_id: string;
+  conversation_id?: string;
 
   @IsString()
   @IsNotEmpty()

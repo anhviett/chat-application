@@ -150,15 +150,19 @@ export const useChat = ({ conversationId, recipientId, autoConnect = true, autoJ
       if (!content.trim()) return;
 
       const tempId = `temp-${Date.now()}`;
-      
-      chatSocket.sendMessage({
-        conversationId: conversationId ? conversationId : undefined,
-        recipientId: recipientId,
+      const payload: any = {
         content: content.trim(),
         type: options?.type || 'text',
         attachments: options?.attachments,
         tempId,
-      });
+      };
+      if (conversationId) {
+        payload.conversationId = conversationId;
+      } else if (recipientId) {
+        payload.recipientId = recipientId;
+        payload.typeConversation = 'DIRECT'; // hoặc truyền type đúng với backend
+      }
+      chatSocket.sendMessage(payload);
 
       const handleMessageSent = (data: { tempId: string; messageId: number }) => {
         console.log('✅ Message confirmation received:', data);
