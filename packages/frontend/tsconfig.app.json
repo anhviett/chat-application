@@ -3,11 +3,7 @@
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": [
-      "ES2020",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
     /* Bundler mode */
@@ -26,51 +22,21 @@
     "noUncheckedSideEffectImports": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "src/*"
-      ],
-      "@/common/*": [
-        "src/common/*"
-      ],
-      "@/components/*": [
-        "src/common/components/*"
-      ],
-      "@/auth/*": [
-        "src/features/auth/*"
-      ],
-      "@/hooks/*": [
-        "src/common/hooks/*"
-      ],
-      "@/features/*": [
-        "src/features/*"
-      ],
-      "@/utils/*": [
-        "src/common/utils/*"
-      ],
-      "@/assets/*": [
-        "src/assets/*"
-      ],
-      "@/pages/*": [
-        "src/pages/*"
-      ],
-      "@/layouts/*": [
-        "src/layouts/*"
-      ],
-      "@/api/*": [
-        "src/api/*"
-      ],
-      "@/sockets/*": [
-        "src/sockets/*"
-      ],
-      "@/contexts/*": [
-        "src/contexts/*"
-      ],
-      "@/types/*": [
-        "src/types/*"
-      ]
+      "@/*": ["src/*"],
+      "@/common/*": ["src/common/*"],
+      "@/components/*": ["src/common/components/*"],
+      "@/auth/*": ["src/features/auth/*"],
+      "@/hooks/*": ["src/common/hooks/*"],
+      "@/features/*": ["src/features/*"],
+      "@/utils/*": ["src/common/utils/*"],
+      "@/assets/*": ["src/assets/*"],
+      "@/pages/*": ["src/pages/*"],
+      "@/layouts/*": ["src/layouts/*"],
+      "@/api/*": ["src/api/*"],
+      "@/sockets/*": ["src/sockets/*"],
+      "@/contexts/*": ["src/contexts/*"],
+      "@/types/*": ["src/types/*"]
     }
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }

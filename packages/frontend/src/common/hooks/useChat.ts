@@ -1,9 +1,15 @@
 // Custom hook for chat management
-import { useEffect, useState, useCallback, useRef } from 'react';
-import { chatSocket } from '../../sockets/chatSocket';
-import { TypingUser, UseChatOptions, Message } from '@/types/message-type';
+import { useEffect, useState, useCallback, useRef } from "react";
+import { chatSocket } from "../../sockets/chatSocket";
+import { TypingUser, UseChatOptions, Message } from "@/types/message-type";
+import { SendMessagePayload } from "@/types/message-type";
 
-export const useChat = ({ conversationId, recipientId, autoConnect = true, autoJoinRoom = true }: UseChatOptions) => {
+export const useChat = ({
+  conversationId,
+  recipientId,
+  autoConnect = true,
+  autoJoinRoom = true,
+}: UseChatOptions) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingUsers, setTypingUsers] = useState<TypingUser[]>([]);
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
@@ -14,9 +20,9 @@ export const useChat = ({ conversationId, recipientId, autoConnect = true, autoJ
   useEffect(() => {
     if (!autoConnect) return;
 
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem("accessToken");
     if (!token) {
-      console.error('No token found for socket connection');
+      console.error("No token found for socket connection");
       return;
     }
 
@@ -30,18 +36,18 @@ export const useChat = ({ conversationId, recipientId, autoConnect = true, autoJ
     };
 
     const handleDisconnect = () => {
-      console.log('Chat disconnected');
+      console.log("Chat disconnected");
       setIsConnected(false);
     };
 
-    const handleError = (error: any) => {
-      console.error('Chat error:', error);
+    const handleError = (error: unknown) => {
+      console.error("Chat error:", error);
       setIsConnected(false);
     };
-    
-    chatSocket.on('connect', handleConnect);
-    chatSocket.on('disconnect', handleDisconnect);
-    chatSocket.on('error', handleError);
+
+    chatSocket.on("connect", handleConnect);
+    chatSocket.on("disconnect", handleDisconnect);
+    chatSocket.on("error", handleError);
 
     if (chatSocket.isConnected()) {
       setIsConnected(true);
@@ -49,12 +55,14 @@ export const useChat = ({ conversationId, recipientId, autoConnect = true, autoJ
         chatSocket.joinRoom(conversationId);
       }
     }
-
   }, [autoConnect, autoJoinRoom, conversationId]);
 
   // Listen for new messages
   useEffect(() => {
-    const handleNewMessage = (data: { message: Message; conversationId: string | number }) => {
+    const handleNewMessage = (data: {
+      message: Message;
+      conversationId: string | number;
+    }) => {
       if (String(data.conversationId) === String(conversationId)) {
         setMessages((prev) => {
           // Check if message already exists
@@ -63,22 +71,26 @@ export const useChat = ({ conversationId, recipientId, autoConnect = true, autoJ
             return false;
           });
           if (exists) return prev;
-          
+
           // Add the new message
           return [...prev, data.message as Message];
         });
       }
     };
 
-    chatSocket.on('newMessage', handleNewMessage);
+    chatSocket.on("newMessage", handleNewMessage);
     return () => {
-      chatSocket.off('newMessage', handleNewMessage);
+      chatSocket.off("newMessage", handleNewMessage);
     };
   }, [conversationId]);
 
   // Listen for typing indicators
   useEffect(() => {
-    const handleUserTyping = (data: { userId: string; username: string; conversationId: string }) => {
+    const handleUserTyping = (data: {
+      userId: string;
+      username: string;
+      conversationId: string;
+    }) => {
       if (data.conversationId === conversationId) {
         setTypingUsers((prev) => {
           if (prev.find((u) => u.userId === data.userId)) return prev;
@@ -87,18 +99,21 @@ export const useChat = ({ conversationId, recipientId, autoConnect = true, autoJ
       }
     };
 
-    const handleUserStoppedTyping = (data: { userId: string; conversationId: string }) => {
+    const handleUserStoppedTyping = (data: {
+      userId: string;
+      conversationId: string;
+    }) => {
       if (data.conversationId === conversationId) {
         setTypingUsers((prev) => prev.filter((u) => u.userId !== data.userId));
       }
     };
 
-    chatSocket.on('userTyping', handleUserTyping);
-    chatSocket.on('userStoppedTyping', handleUserStoppedTyping);
+    chatSocket.on("userTyping", handleUserTyping);
+    chatSocket.on("userStoppedTyping", handleUserStoppedTyping);
 
     return () => {
-      chatSocket.off('userTyping', handleUserTyping);
-      chatSocket.off('userStoppedTyping', handleUserStoppedTyping);
+      chatSocket.off("userTyping", handleUserTyping);
+      chatSocket.off("userStoppedTyping", handleUserStoppedTyping);
     };
   }, [conversationId]);
 
@@ -107,9 +122,12 @@ export const useChat = ({ conversationId, recipientId, autoConnect = true, autoJ
       setOnlineUsers(users);
     };
 
-    const handleUserStatusChanged = (data: { userId: string; status: 'online' | 'offline' }) => {
+    const handleUserStatusChanged = (data: {
+      userId: string;
+      status: "online" | "offline";
+    }) => {
       setOnlineUsers((prev) => {
-        if (data.status === 'online') {
+        if (data.status === "online") {
           return [...new Set([...prev, data.userId])];
         } else {
           return prev.filter((id) => id !== data.userId);
@@ -117,42 +135,53 @@ export const useChat = ({ conversationId, recipientId, autoConnect = true, autoJ
       });
     };
 
-    chatSocket.on('onlineUsers', handleOnlineUsers);
-    chatSocket.on('userStatusChanged', handleUserStatusChanged);
+    chatSocket.on("onlineUsers", handleOnlineUsers);
+    chatSocket.on("userStatusChanged", handleUserStatusChanged);
     chatSocket.getOnlineUsers();
 
     return () => {
-      chatSocket.off('onlineUsers', handleOnlineUsers);
-      chatSocket.off('userStatusChanged', handleUserStatusChanged);
+      chatSocket.off("onlineUsers", handleOnlineUsers);
+      chatSocket.off("userStatusChanged", handleUserStatusChanged);
     };
   }, []);
 
   useEffect(() => {
-    const handleMessageRead = (data: { messageId: number; conversationId: string; readBy: string }) => {
+    const handleMessageRead = (data: {
+      messageId: number;
+      conversationId: string;
+      readBy: string;
+    }) => {
       if (data.conversationId === conversationId) {
         setMessages((prev) =>
           prev.map((msg) =>
-            msg.id === data.messageId ? { ...msg, status: 'read' as const } : msg
-          )
+            msg.id === data.messageId
+              ? { ...msg, status: "read" as const }
+              : msg,
+          ),
         );
       }
     };
 
-    chatSocket.on('messageRead', handleMessageRead);
+    chatSocket.on("messageRead", handleMessageRead);
     return () => {
-      chatSocket.off('messageRead', handleMessageRead);
+      chatSocket.off("messageRead", handleMessageRead);
     };
   }, [conversationId]);
 
   // Send message
   const sendMessage = useCallback(
-    (content: string, options?: { type?: 'text' | 'image'; attachments?: string[] }) => {
+    (
+      content: string,
+      options?: { type?: "text" | "image"; attachments?: string[] },
+    ) => {
       if (!content.trim()) return;
 
+
       const tempId = `temp-${Date.now()}`;
-      const payload: any = {
+      
+      const payload: SendMessagePayload = {
         content: content.trim(),
-        type: options?.type || 'text',
+        type: options?.type || "text",
         attachments: options?.attachments,
         tempId,
       };
@@ -160,28 +189,31 @@ export const useChat = ({ conversationId, recipientId, autoConnect = true, autoJ
         payload.conversationId = conversationId;
       } else if (recipientId) {
         payload.recipientId = recipientId;
-        payload.typeConversation = 'DIRECT'; // hoặc truyền type đúng với backend
+        payload.typeConversation = "DIRECT"; // hoặc truyền type đúng với backend
       }
       chatSocket.sendMessage(payload);
 
-      const handleMessageSent = (data: { tempId: string; messageId: number }) => {
-        console.log('✅ Message confirmation received:', data);
+      const handleMessageSent = (data: {
+        tempId: string;
+        messageId: number;
+      }) => {
+        console.log("✅ Message confirmation received:", data);
         if (data.tempId === tempId) {
-          console.log('✨ Updating message with real ID');
+          console.log("✨ Updating message with real ID");
           setMessages((prev) =>
-            prev.map((msg) => 
-              (msg.id === tempId) 
-                ? { ...msg, id: data.messageId, status: 'delivered' as const }
-                : msg
-            )
+            prev.map((msg) =>
+              msg.id === tempId
+                ? { ...msg, id: data.messageId, status: "delivered" as const }
+                : msg,
+            ),
           );
-          chatSocket.off('messageSent', handleMessageSent);
+          chatSocket.off("messageSent", handleMessageSent);
         }
       };
 
-      chatSocket.on('messageSent', handleMessageSent);
+      chatSocket.on("messageSent", handleMessageSent);
     },
-    [conversationId, recipientId]
+    [conversationId, recipientId],
   );
 
   // Typing indicators
@@ -216,7 +248,7 @@ export const useChat = ({ conversationId, recipientId, autoConnect = true, autoJ
         chatSocket.markAsRead(conversationId, messageId);
       }
     },
-    [conversationId]
+    [conversationId],
   );
 
   const markConversationAsRead = useCallback(() => {
@@ -229,7 +261,7 @@ export const useChat = ({ conversationId, recipientId, autoConnect = true, autoJ
     (userId: string) => {
       return onlineUsers.includes(userId);
     },
-    [onlineUsers]
+    [onlineUsers],
   );
 
   return {

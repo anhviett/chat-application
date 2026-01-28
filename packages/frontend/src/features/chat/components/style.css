@@ -19,8 +19,8 @@
 }
 
 .online-contact-slider .swiper-slide {
-    width: auto !important;
-    flex-shrink: 0;
+  width: auto !important;
+  flex-shrink: 0;
 }
 
 /* .online-contact-slider .swiper-slide > div {

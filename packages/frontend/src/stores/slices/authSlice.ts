@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { UserType } from '@/types/user-type';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import type { UserType } from "@/types/user-type";
 
 interface AuthState {
   user: UserType | null;
@@ -18,12 +18,10 @@ const initialState: AuthState = {
 };
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
   reducers: {
-    setSectionHeader: () => {
-
-    },
+    setSectionHeader: () => {},
 
     // Set user data after login
     setCredentials: (
@@ -32,7 +30,7 @@ const authSlice = createSlice({
         user: UserType;
         accessToken: string;
         refreshToken: string;
-      }>
+      }>,
     ) => {
       state.user = action.payload.user;
       state.accessToken = action.payload.accessToken;
@@ -72,9 +70,9 @@ const authSlice = createSlice({
 
     // Initialize auth from localStorage
     initializeAuth: (state) => {
-      const storedToken = localStorage.getItem('accessToken');
-      const storedRefreshToken = localStorage.getItem('refreshToken');
-      const storedUser = localStorage.getItem('user');
+      const storedToken = localStorage.getItem("accessToken");
+      const storedRefreshToken = localStorage.getItem("refreshToken");
+      const storedUser = localStorage.getItem("user");
 
       if (storedToken && storedUser) {
         state.accessToken = storedToken;

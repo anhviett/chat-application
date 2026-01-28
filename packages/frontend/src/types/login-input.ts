@@ -1,5 +1,5 @@
-export interface LoginInputs {
-    email: string;
-    password: string;
-    expiresInMins?: number;
+export interface LoginInput {
+  email: string;
+  password: string;
+  expiresInMins?: number;
 }

@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ChatThread } from '@/types/message-type';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ChatThread } from "@/types/message-type";
 
 interface ChatUiState {
   isInfoWindowOpen: boolean;
@@ -14,7 +14,7 @@ const initialState: ChatUiState = {
 };
 
 const chatUiSlice = createSlice({
-  name: 'chatUi',
+  name: "chatUi",
   initialState,
   reducers: {
     toggleInfoWindow(state) {
@@ -39,5 +39,12 @@ const chatUiSlice = createSlice({
   },
 });
 
-export const { toggleInfoWindow, setInfoWindowOpen, setChatThread, backToList, toggleInvite, setToggleInvite } = chatUiSlice.actions;
+export const {
+  toggleInfoWindow,
+  setInfoWindowOpen,
+  setChatThread,
+  backToList,
+  toggleInvite,
+  setToggleInvite,
+} = chatUiSlice.actions;
 export default chatUiSlice.reducer;

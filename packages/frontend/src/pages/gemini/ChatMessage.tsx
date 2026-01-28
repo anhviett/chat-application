@@ -1,18 +1,17 @@
-import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { useEffect, useRef } from 'react';
-import { useGeminiAi } from '@/common/hooks/useGeminiAi';
-import Button from '@/common/components/Button';
-import InputCustom from '@/common/components/InputCustom';
+import ReactMarkdown from "react-markdown";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { useEffect, useRef } from "react";
+import { useGeminiAi } from "@/common/hooks/useGeminiAi";
+import Button from "@/common/components/Button";
+import InputCustom from "@/common/components/InputCustom";
 
 const ChatMessage = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { messages, input, isTyping, setInput, sendMessage } = useGeminiAi();
-  console.log('messages: ', messages);
 
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   return (
@@ -28,8 +27,8 @@ const ChatMessage = () => {
               <div key={index} className={`message ${msg.role}`}>
                 <ReactMarkdown
                   components={{
-                    code({ node, inline, className, children, ...props }) {
-                      const match = /language-(\w+)/.exec(className || '');
+                    code({ inline, className, children, ...props }) {
+                      const match = /language-(\w+)/.exec(className || "");
                       return !inline && match ? (
                         <SyntaxHighlighter
                           style={vscDarkPlus}
@@ -37,7 +36,7 @@ const ChatMessage = () => {
                           PreTag="div"
                           {...props}
                         >
-                          {String(children).replace(/\n$/, '')}
+                          {String(children).replace(/\n$/, "")}
                         </SyntaxHighlighter>
                       ) : (
                         <code className={className} {...props}>
@@ -58,15 +57,20 @@ const ChatMessage = () => {
           {/* Input box */}
           <div className="flex gap-2 p-2 border rounded-xl shadow-sm">
             <InputCustom
-              type='text' 
-              className="flex-1 outline-none" 
-              placeholder="Can I help you with something?" 
-              value={input} onChange={(e) => setInput(e.target.value)} 
-              onKeyDown={(e) => e.key === 'Enter' && sendMessage(input)} 
-              disabled={isTyping} 
+              type="text"
+              className="flex-1 outline-none"
+              placeholder="Can I help you with something?"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && sendMessage(input)}
+              disabled={isTyping}
             />
-            <Button onClick={() => sendMessage(input)} disabled={isTyping} variant="primary">
-              {isTyping ? 'Typing...' : 'AI Search'}
+            <Button
+              onClick={() => sendMessage(input)}
+              disabled={isTyping}
+              variant="primary"
+            >
+              {isTyping ? "Typing..." : "AI Search"}
             </Button>
           </div>
         </div>

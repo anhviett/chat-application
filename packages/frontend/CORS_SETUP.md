@@ -3,6 +3,7 @@
 ## 📋 Checklist để fix CORS
 
 ### ✅ Frontend (Đã setup xong)
+
 - [x] Axios config với `withCredentials: true`
 - [x] Headers: `Content-Type` và `Accept`
 - [x] Vite proxy config cho development
@@ -16,21 +17,21 @@
 
 ```javascript
 // backend/server.js hoặc backend/app.js
-const express = require('express');
-const cors = require('cors');
+const express = require("express");
+const cors = require("cors");
 
 const app = express();
 
 // CORS Configuration
 const corsOptions = {
   origin: [
-    'http://localhost:5173',  // Vite dev server
-    'http://localhost:3000',  // React dev server (nếu dùng)
+    "http://localhost:5173", // Vite dev server
+    "http://localhost:3000", // React dev server (nếu dùng)
   ],
-  credentials: true,  // ⚠️ QUAN TRỌNG: Cho phép gửi cookies
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['set-cookie'],
+  credentials: true, // ⚠️ QUAN TRỌNG: Cho phép gửi cookies
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  exposedHeaders: ["set-cookie"],
 };
 
 app.use(cors(corsOptions));
@@ -40,12 +41,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.post('/api/v1/auth/login', (req, res) => {
+app.post("/api/v1/auth/login", (req, res) => {
   // Login logic
 });
 
 app.listen(3000, () => {
-  console.log('Server running on port 3000');
+  console.log("Server running on port 3000");
 });
 ```
 
@@ -53,21 +54,21 @@ app.listen(3000, () => {
 
 ```typescript
 // main.ts
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { NestFactory } from "@nestjs/core";
+import { AppModule } from "./app.module";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
   // Enable CORS
   app.enableCors({
     origin: [
-      'http://localhost:5173',  // Vite dev server
-      'http://localhost:3000',  // React dev server
+      "http://localhost:5173", // Vite dev server
+      "http://localhost:3000", // React dev server
     ],
-    credentials: true,  // ⚠️ QUAN TRỌNG
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true, // ⚠️ QUAN TRỌNG
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   });
 
   await app.listen(3000);
@@ -156,6 +157,7 @@ CORS_ALLOW_HEADERS = [
 1. Mở Chrome DevTools → Network tab
 2. Thử login
 3. Kiểm tra request headers:
+
    ```
    Request Headers:
    ✅ Origin: http://localhost:5173
@@ -172,17 +174,23 @@ CORS_ALLOW_HEADERS = [
 ### Nếu vẫn lỗi CORS:
 
 #### ❌ Lỗi: "has been blocked by CORS policy"
+
 **Giải pháp:**
+
 - Đảm bảo backend có cấu hình CORS
 - Kiểm tra origin trong backend có match với frontend URL không
 
 #### ❌ Lỗi: "Response to preflight request doesn't pass"
+
 **Giải pháp:**
+
 - Thêm `OPTIONS` method vào backend
 - Kiểm tra `Access-Control-Allow-Methods` header
 
 #### ❌ Lỗi: "Credentials flag is 'true', but 'Access-Control-Allow-Credentials' header is ''"
+
 **Giải pháp:**
+
 - Thêm `credentials: true` trong CORS config ở backend
 - Đảm bảo `withCredentials: true` ở frontend (đã có)
 
@@ -191,11 +199,13 @@ CORS_ALLOW_HEADERS = [
 ## 📝 Environment Variables
 
 ### Development (.env)
+
 ```env
 VITE_API_URL=http://localhost:3000/api/v1
 ```
 
 ### Production (.env.production)
+
 ```env
 VITE_API_URL=https://your-production-api.com/api/v1
 ```
@@ -207,12 +217,14 @@ VITE_API_URL=https://your-production-api.com/api/v1
 Sau khi thay đổi config, cần restart:
 
 ### Frontend:
+
 ```bash
 # Stop dev server (Ctrl+C)
 npm run dev
 ```
 
 ### Backend:
+
 ```bash
 # Stop backend server
 # Restart lại backend

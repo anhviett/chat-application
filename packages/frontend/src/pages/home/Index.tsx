@@ -10,50 +10,50 @@ import Status from "@/pages/status/Index";
 import Gemini from "../gemini/Index";
 
 const Home = () => {
-    // 📍 DETECT ACTIVE ROUTE - Nhận biết đang ở route nào
-    const location = useLocation();
-    const currentPath = location.pathname;
+  // 📍 DETECT ACTIVE ROUTE - Nhận biết đang ở route nào
+  const location = useLocation();
+  const currentPath = location.pathname;
 
-    // 🔌 SOCKET CONNECTION
-    useEffect(() => {
-        socket.on("connect", () => {
-            console.log("Connected:", socket.id);
-        });
+  // 🔌 SOCKET CONNECTION
+  useEffect(() => {
+    socket.on("connect", () => {
+      console.log("Connected:", socket.id);
+    });
 
-        return () => {
-            socket.off("connect");
-        };
-    }, []);
-
-    // 🎨 RENDER SIDEBAR COMPONENT - Hiển thị component tương ứng với route
-    const renderSidebarContent = () => {
-        switch (currentPath) {
-            case '/':
-            case '/chat':
-                return <Chat />;
-            case '/contact':
-                return <Contact />;
-            case '/profile':
-                return <Profile />;
-            case '/group':
-                return <Group />;
-            case '/status':
-                return <Status />;
-            case '/setting':
-                return <Setting />;
-            case '/gemini':
-                return <Gemini />;
-            default:
-                return <Chat />;
-        }
+    return () => {
+      socket.off("connect");
     };
+  }, []);
 
-    return (
-        <>
-            {/* Sidebar Content - Render component dựa vào route */}
-            {renderSidebarContent()}
-        </>
-    );
+  // 🎨 RENDER SIDEBAR COMPONENT - Hiển thị component tương ứng với route
+  const renderSidebarContent = () => {
+    switch (currentPath) {
+      case "/":
+      case "/chat":
+        return <Chat />;
+      case "/contact":
+        return <Contact />;
+      case "/profile":
+        return <Profile />;
+      case "/group":
+        return <Group />;
+      case "/status":
+        return <Status />;
+      case "/setting":
+        return <Setting />;
+      case "/gemini":
+        return <Gemini />;
+      default:
+        return <Chat />;
+    }
+  };
+
+  return (
+    <>
+      {/* Sidebar Content - Render component dựa vào route */}
+      {renderSidebarContent()}
+    </>
+  );
 };
 
 export default Home;

@@ -3,6 +3,7 @@
 ## 📖 DummyJSON là gì?
 
 DummyJSON là một REST API miễn phí để test và prototype:
+
 - ✅ Hỗ trợ CORS đầy đủ
 - ✅ Có authentication endpoint
 - ✅ Trả về fake data realistic
@@ -13,40 +14,42 @@ DummyJSON là một REST API miễn phí để test và prototype:
 ## 🚀 Quick Setup:
 
 ### 1. Update `.env`:
+
 ```env
 VITE_API_URL=https://dummyjson.com
 ```
 
 ### 2. Update `auth.ts` (nếu cần):
+
 ```typescript
 // src/api/auth.ts
-import { api } from "./configs/axiosConfig"
+import { api } from "./configs/axiosConfig";
 
 export const authApi = {
-    login: async function (data: any) {
-        const response = await api.request({
-            url: '/auth/login',
-            method: "POST",
-            data: {
-                username: data.username,
-                password: data.password,
-                expiresInMins: 30, // optional, defaults to 60
-            },
-        })
-        return response.data
-    },
-}
+  login: async function (data: any) {
+    const response = await api.request({
+      url: "/auth/login",
+      method: "POST",
+      data: {
+        username: data.username,
+        password: data.password,
+        expiresInMins: 30, // optional, defaults to 60
+      },
+    });
+    return response.data;
+  },
+};
 ```
 
 ### 3. Test Login Credentials:
 
 ```javascript
 // Demo users
-Username: emilys
-Password: emilyspass
+Username: emilys;
+Password: emilyspass;
 
-Username: michaelw
-Password: michaelwpass
+Username: michaelw;
+Password: michaelwpass;
 ```
 
 ---
@@ -54,6 +57,7 @@ Password: michaelwpass
 ## 📋 API Response Format:
 
 ### Successful Login:
+
 ```json
 {
   "id": 1,
@@ -69,6 +73,7 @@ Password: michaelwpass
 ```
 
 ### Failed Login:
+
 ```json
 {
   "message": "Invalid credentials"
@@ -82,38 +87,38 @@ Password: michaelwpass
 ```typescript
 // src/contexts/AuthContext.tsx
 const login = (token: string, refreshToken: string, userData: User) => {
-    localStorage.setItem('accessToken', token);
-    localStorage.setItem('refreshToken', refreshToken);
-    localStorage.setItem('user', JSON.stringify(userData));
+  localStorage.setItem("accessToken", token);
+  localStorage.setItem("refreshToken", refreshToken);
+  localStorage.setItem("user", JSON.stringify(userData));
 
-    setAccessToken(token);
-    setUser(userData);
-}
+  setAccessToken(token);
+  setUser(userData);
+};
 
 // src/layouts/Login.tsx
 const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    
-    try {
-        const data = await authApi.login(inputs);
-        
-        // DummyJSON response structure
-        const user = {
-            id: data.id,
-            username: data.username,
-            email: data.email,
-            firstName: data.firstName,
-            lastName: data.lastName,
-            avatar: data.image,
-        };
-        
-        login(data.accessToken, data.refreshToken, user);
-        navigate('/');
-    } catch (error) {
-        console.error("Login error:", error);
-        alert('Invalid credentials');
-    }
-}
+  event.preventDefault();
+
+  try {
+    const data = await authApi.login(inputs);
+
+    // DummyJSON response structure
+    const user = {
+      id: data.id,
+      username: data.username,
+      email: data.email,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      avatar: data.image,
+    };
+
+    login(data.accessToken, data.refreshToken, user);
+    navigate("/");
+  } catch (error) {
+    console.error("Login error:", error);
+    alert("Invalid credentials");
+  }
+};
 ```
 
 ---
@@ -121,6 +126,7 @@ const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 ## 📝 Available Endpoints:
 
 ### Authentication:
+
 ```
 POST /auth/login
 POST /auth/refresh
@@ -128,6 +134,7 @@ GET  /auth/me (with Bearer token)
 ```
 
 ### Users:
+
 ```
 GET  /users
 GET  /users/{id}
@@ -135,6 +142,7 @@ GET  /users/search?q={query}
 ```
 
 ### Products:
+
 ```
 GET  /products
 GET  /products/{id}
@@ -146,21 +154,25 @@ GET  /products/search?q={query}
 ## ✅ Test Steps:
 
 1. **Update .env**:
+
    ```env
    VITE_API_URL=https://dummyjson.com
    ```
 
 2. **Restart dev server**:
+
    ```powershell
    npm run dev
    ```
 
 3. **Open browser**:
+
    ```
    http://localhost:5173/login
    ```
 
 4. **Login với**:
+
    ```
    Username: emilys
    Password: emilyspass
@@ -187,14 +199,14 @@ GET  /products/search?q={query}
 
 // Example: Get current user
 const getCurrentUser = async () => {
-    const response = await api.get('/auth/me');
-    return response.data;
+  const response = await api.get("/auth/me");
+  return response.data;
 };
 
 // Example: Get all users
 const getUsers = async () => {
-    const response = await api.get('/users');
-    return response.data;
+  const response = await api.get("/users");
+  return response.data;
 };
 ```
 
@@ -203,12 +215,15 @@ const getUsers = async () => {
 ## 🐛 Common Issues:
 
 ### ❌ Error: "Invalid credentials"
+
 **Fix:** Đảm bảo dùng đúng username/password từ list demo users
 
 ### ❌ Error: "Network Error"
+
 **Fix:** Check internet connection, DummyJSON API có thể down
 
 ### ❌ Error: "token is invalid"
+
 **Fix:** Token có thể expired, login lại
 
 ---
@@ -228,16 +243,19 @@ const getUsers = async () => {
 ## 🌐 Alternative APIs với CORS support:
 
 ### JSONPlaceholder:
+
 ```env
 VITE_API_URL=https://jsonplaceholder.typicode.com
 ```
 
 ### ReqRes:
+
 ```env
 VITE_API_URL=https://reqres.in/api
 ```
 
 ### FakeStoreAPI:
+
 ```env
 VITE_API_URL=https://fakestoreapi.com
 ```

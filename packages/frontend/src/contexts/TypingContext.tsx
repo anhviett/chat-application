@@ -1,19 +1,15 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { useState, useCallback } from "react";
+import { TypingContext } from "@/constants/typing-context.constant";
 
-type TypingContextType = {
-  typingUsers: Record<number, boolean>; // { chatId: isTyping }
-  setUserTyping: (chatId: number, isTyping: boolean) => void;
-};
-
-const TypingContext = createContext<TypingContextType | undefined>(undefined);
-
-export const TypingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const TypingProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [typingUsers, setTypingUsers] = useState<Record<number, boolean>>({});
 
   const setUserTyping = useCallback((chatId: number, isTyping: boolean) => {
-    setTypingUsers(prev => ({
+    setTypingUsers((prev) => ({
       ...prev,
-      [chatId]: isTyping
+      [chatId]: isTyping,
     }));
   }, []);
 
@@ -24,10 +20,3 @@ export const TypingProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   );
 };
 
-export const useTyping = () => {
-  const context = useContext(TypingContext);
-  if (!context) {
-    throw new Error('useTyping must be used within TypingProvider');
-  }
-  return context;
-};

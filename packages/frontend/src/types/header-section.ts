@@ -1,3 +1,3 @@
 export interface HeaderSection {
-    title: string;
+  title: string;
 }
