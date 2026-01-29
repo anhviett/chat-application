@@ -40,6 +40,7 @@ export function useGeminiAi() {
         if (done) break;
 
         const chunk = decoder.decode(value);
+        
         const cleanChunk = chunk.replace(/data: /g, "").replace(/\n\n/g, "");
 
         setMessages((prev) =>

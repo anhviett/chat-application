@@ -9,7 +9,7 @@ export class CreateMessagesCollectionMigration implements Migration {
       validator: {
         $jsonSchema: {
           bsonType: 'object',
-          required: ['sender', 'conversationId', 'content'],
+          required: ['sender', 'conversation_id', 'content', 'type', 'status'],
           properties: {
             _id: { bsonType: 'objectId' },
             sender: {
@@ -30,12 +30,19 @@ export class CreateMessagesCollectionMigration implements Migration {
               description: 'Message type',
             },
             status: {
-              bsonType: 'string',
-              enum: ['sent', 'delivered', 'read'],
-              description: 'Message status',
+              bsonType: 'int',
+              enum: [0, 1, 2],
+              description: 'Message status (0: SENT, 1: DELIVERED, 2: READ)',
             },
             readBy: {
               bsonType: 'array',
+              items: {
+                bsonType: 'object',
+                properties: {
+                  user_id: { bsonType: 'objectId' },
+                  readAt: { bsonType: 'date' },
+                },
+              },
               description: 'Users who read this message',
             },
             attachments: {

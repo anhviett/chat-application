@@ -4,7 +4,7 @@ export interface UserType {
   email: string;
   firstName?: string;
   lastName?: string;
-  gender?: string;
+  gender?: Number;
   avatar?: string;
   name?: string;
   about?: string;

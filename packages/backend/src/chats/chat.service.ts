@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Message, MessageStatus, MessageType } from './schemas/message.schema';
+import { Message } from './schemas/message.schema';
+import { MessageStatus, } from '../common/enums/message-type.enum';
 import { Conversation, ConversationType } from './schemas/conversation.schema';
 import { SendMessageDto, CreateConversationDto } from './dto/chat.dto';
 
@@ -49,7 +50,9 @@ export class ChatService {
       settings: dto.settings,
     });
 
-    return await conversation.save();
+    console.log(await conversation.save());
+    
+    return conversation;
   }
 
   // Get user conversations
@@ -93,9 +96,10 @@ export class ChatService {
   // Send a message
   async sendMessage(userId: string, dto: SendMessageDto) {
     const userObjectId = new Types.ObjectId(userId);
-    let conversation = null;
-    let conversationObjectId = null;
+    let conversation: Conversation | null = null;
+    let conversationObjectId: Types.ObjectId | null = null;
 
+    // Nếu có conversation_id thì tìm conversation
     if (dto.conversation_id) {
       conversationObjectId = new Types.ObjectId(dto.conversation_id);
       conversation = await this.conversationModel.findOne({
@@ -104,35 +108,57 @@ export class ChatService {
       });
     }
 
-    // Nếu không có conversation_id, hoặc không tìm thấy, thử tạo mới nếu là DIRECT
-    if (!conversation && dto.type === ConversationType.DIRECT && dto.participants) {
+    // Nếu có recipientId thì tạo/tìm direct conversation
+    if (!conversation && dto.recipientId) {
       conversation = await this.createConversation(userId, {
         type: ConversationType.DIRECT,
-        participants: dto.participants,
-        name: dto.name,
-        avatar: dto.avatar,
-        description: dto.description,
-        settings: dto.settings,
+        participants: [dto.recipientId],
       });
+      conversationObjectId = conversation._id;
     }
 
-    if (!conversation) {
+    if (!conversation || !conversationObjectId) {
       throw new ForbiddenException('Missing conversation_id or participants/type for new conversation');
     }
 
-    const message = new this.messageModel({
+    // Kiểm tra các trường quan trọng
+    if (!userObjectId || !conversationObjectId || !dto.content || !dto.type) {
+      console.error('Missing required field:', {
+        userObjectId,
+        conversationObjectId,
+        content: dto.content,
+        type: dto.type,
+      });
+      throw new ForbiddenException('Missing required field for message');
+    }
+
+    const messageData = {
       sender: userObjectId,
-      conversation_id: conversation._id,
+      conversation_id: conversationObjectId,
       content: dto.content,
       type: dto.type,
       status: MessageStatus.SENT,
       attachments: dto.attachments || [],
       metadata: dto.metadata,
-    });
+    };
+    const message = new this.messageModel(messageData);
+    
+    const savedMessage = await message.save();
+    const populatedMessage = await savedMessage.populate('sender', 'firstName lastName avatar');
 
-    await message.save();
-
-    return await message.populate('sender', 'firstName lastName avatar');
+      return {
+        _id: populatedMessage._id,
+        sender: populatedMessage.sender,
+        conversation_id: populatedMessage.conversation_id,
+        content: populatedMessage.content,
+        type: populatedMessage.type,
+        status: populatedMessage.status,
+        attachments: populatedMessage.attachments,
+        metadata: populatedMessage.metadata,
+        readBy: populatedMessage.readBy,
+        isDeleted: populatedMessage.isDeleted,
+        deletedAt: populatedMessage.deletedAt,
+      };
   }
 
   // Get messages for a conversation

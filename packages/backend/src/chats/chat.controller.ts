@@ -51,7 +51,6 @@ export class ChatController {
   async getUserConversations(@Request() req: any) {
     const userId = req.user?.id || null;
     if (!userId) {
-      // return this.chatService.findAll();
       return [];
     }
     return this.chatService.getUserConversations(userId);
@@ -127,12 +126,14 @@ export class ChatController {
   }
 
   @Post('messages')
+  @UseGuards(JwtAuthGuard)
   async sendMessage(@Request() req, @Body() dto: SendMessageDto) {
     const userId = req.user?.id;
     return this.chatService.sendMessage(userId, dto);
   }
 
   @Put('messages/:id')
+  @UseGuards(JwtAuthGuard)
   async updateMessage(
     @Request() req,
     @Param('id') messageId: string,

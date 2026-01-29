@@ -13,7 +13,7 @@ export const api = axios.create({
 });
 
 // defining a custom error handler for all APIs
-const errorHandler = (error: unknown) => {
+const errorHandler = (error: { response : { status?: number } | undefined }) => {
   const statusCode = error?.response?.status;
 
   // logging only errors that are not 401
@@ -26,7 +26,7 @@ const errorHandler = (error: unknown) => {
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("accessToken"); // ✅ Đổi từ 'access_token' sang 'accessToken'
+    const token = localStorage.getItem("accessToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

@@ -5,3 +5,9 @@ export enum MessageType {
   AUDIO = 'audio',
   VIDEO = 'video',
 }
+
+export enum MessageStatus {
+  SENT = 0,
+  DELIVERED = 1,
+  READ = 2,
+}

@@ -2,7 +2,8 @@ import React, { useState, useRef, useCallback } from "react";
 import Button from "@/common/components/Button";
 import { useTyping } from "@/common/hooks/useTyping";
 import { chatApi } from "@/api/chat";
-import { MessageType } from "@/enums/sendMessageType.enum";
+import { MESSAGE_TYPE } from "@/enums/sendMessageType.enum";
+import { useChat } from "@/common/hooks/useChat";
 import { useAuth } from "@/common/hooks/useAuth";
 import { ChatThread } from "@/types/message-type";
 import { useSelector } from "react-redux";
@@ -28,10 +29,29 @@ const Conversation: React.FC<ConversationProps> = () => {
   const onBack = () => dispatch(backToList());
 
   // Use chat hook to handle messages
-//   const { sendMessage, messages } = useChat({
-//     conversationId: chatThread?.conversationId,
-//     recipientId: chatThread?.recipientId,
-//   });
+  const { sendMessage, messages, setMessages } = useChat({
+    conversationId: chatThread?.conversationId,
+    recipientId: chatThread?.recipientId,
+  });
+  console.log(messages, )
+
+  // Fetch all messages from API when entering a conversation
+  React.useEffect(() => {
+    const fetchMessages = async () => {
+      console.log('chatThread: ', chatThread);
+      if (chatThread?.conversationId) {
+        try {
+          const data = await chatApi.getConversationMessages(chatThread.conversationId);
+          console.log('data: ', data);
+          setMessages(Array.isArray(data) ? data : data?.messages || []);
+        } catch (err) {
+          console.error("Failed to fetch messages:", err);
+        }
+      }
+    };
+    fetchMessages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatThread?.conversationId, setMessages]);
 
   const handleContactInfoToggle = () => {
     const newState = !showContactInfo;
@@ -67,21 +87,17 @@ const Conversation: React.FC<ConversationProps> = () => {
     if (!message.trim() || !chatThread) return;
 
     try {
-      // Nếu đã có conversationId thì gửi bình thường
+      const payload: any = {
+        content: message.trim(),
+        type: MESSAGE_TYPE.TEXT,
+      };
       if (chatThread.conversationId) {
-        await chatApi.sendMessage({
-          conversationId: chatThread.conversationId,
-          content: message.trim(),
-          type: MessageType.TEXT,
-        });
+        payload.conversationId = chatThread.conversationId;
       } else {
-        // Nếu chưa có conversationId (tin nhắn đầu tiên), gửi recipientId và type
-        await chatApi.sendMessage({
-          recipientId: chatThread.recipientId,
-          content: message.trim(),
-          type: MessageType.TEXT,
-        });
+        payload.recipientId = chatThread.recipientId;
       }
+      await chatApi.sendMessage(payload);
+
       setMessage("");
       const threadId = chatThread._id || chatThread.id;
       if (threadId) setUserTyping(threadId, false);
@@ -103,7 +119,7 @@ const Conversation: React.FC<ConversationProps> = () => {
             type="button"
             onClick={onBack}
             className="lg:hidden mr-3 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
-            variant="ghost"
+            variant="glass"
           >
             <i className="fa-solid fa-arrow-left text-gray-600"></i>
           </Button>
@@ -122,23 +138,23 @@ const Conversation: React.FC<ConversationProps> = () => {
           </div>
         </div>
         <div className="flex items-center gap-4 text-white">
-          <Button type="button" variant="ghost">
+          <Button type="button" variant="social">
             <i className="fa-solid fa-search text-sm text-gray-400"></i>
           </Button>
-          <Button type="button" variant="ghost">
+          <Button type="button" variant="social">
             <i className="fa-solid fa-phone text-sm text-gray-400 cursor-pointer"></i>
           </Button>
-          <Button type="button" variant="ghost">
+          <Button type="button" variant="social">
             <i className="fa-solid fa-video text-sm text-gray-400 cursor-pointer"></i>
           </Button>
           <Button
             type="button"
             onClick={handleContactInfoToggle}
-            variant="ghost"
+            variant="social"
           >
             <i className="fa-solid fa-circle-info text-sm text-gray-400 cursor-pointer"></i>
           </Button>
-          <Button type="button" variant="ghost">
+          <Button type="button" variant="social">
             <i className="fa-solid fa-ellipsis-vertical text-sm text-gray-400 cursor-pointer"></i>
           </Button>
         </div>
@@ -187,10 +203,10 @@ const Conversation: React.FC<ConversationProps> = () => {
 
       <div className="px-4 py-3 border-t border-gray-2 absolute bottom-0 w-full">
         <div className="flex items-center gap-2">
-          <Button className="text-black/80 hover:text-white" variant="ghost">
+          <Button className="text-black/80 hover:text-white" variant="glass">
             <i className="fa-regular fa-face-smile"></i>
           </Button>
-          <Button className="text-black/80 hover:text-white" variant="ghost">
+          <Button className="text-black/80 hover:text-white" variant="glass">
             <i className="fa-solid fa-paperclip"></i>
           </Button>
           <textarea

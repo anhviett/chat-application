@@ -1,3 +1,4 @@
+
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -10,7 +11,7 @@ import { User } from './schemas/user.schema';
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
-  ) {}
+  ) { }
 
   async create(dto: CreateUserDto) {
     // Check if user already exists
@@ -80,7 +81,7 @@ export class UsersService {
 
   async findOne(_id: string) {
     const user = await this.userModel.findById(_id).select('-password').exec();
-    
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -118,5 +119,23 @@ export class UsersService {
     const userObj = user.toObject ? user.toObject() : user;
     delete userObj.password;
     return userObj;
+  }
+
+  /**
+   * Get user's theme
+   */
+  async getTheme(_id: string): Promise<'light' | 'dark'> {
+    const user = await this.userModel.findById(_id).select('theme').exec();
+    if (!user) throw new NotFoundException('User not found');
+    return user.theme || 'light';
+  }
+
+  /**
+   * Update user's theme
+   */
+  async updateTheme(_id: string, theme: 'light' | 'dark') {
+    const user = await this.userModel.findByIdAndUpdate(_id, { theme }, { new: true }).select('theme').exec();
+    if (!user) throw new NotFoundException('User not found');
+    return user;
   }
 }

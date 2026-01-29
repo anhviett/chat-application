@@ -9,6 +9,7 @@ import {
   UseGuards,
   UseInterceptors,
   Request,
+  Put,
 } from '@nestjs/common';
 import { ClassSerializerInterceptor } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -18,7 +19,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   /**
    * Get currently logged-in user profile
@@ -32,7 +33,7 @@ export class UsersController {
     if (!req.user || !req.user.id) {
       throw new Error('User not found in request');
     }
-    
+
     const currentUser = await this.usersService.findOne(req.user.id.toString());
     return {
       success: true,
@@ -64,5 +65,31 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') _id: string) {
     return this.usersService.remove(_id);
+  }
+
+  /**
+   * Get current user's theme
+   */
+  @Get('me/theme')
+  @UseGuards(JwtAuthGuard)
+  async getTheme(@Request() req: any) {
+    if (!req.user || !req.user.id) {
+      throw new Error('User not found in request');
+    }
+    const theme = await this.usersService.getTheme(req.user.id.toString());
+    return { success: true, theme };
+  }
+
+  /**
+   * Update current user's theme
+   */
+  @Put('me/theme')
+  @UseGuards(JwtAuthGuard)
+  async updateTheme(@Request() req: any, @Body() body: { theme: 'light' | 'dark' }) {
+    if (!req.user || !req.user.id) {
+      throw new Error('User not found in request');
+    }
+    const updated = await this.usersService.updateTheme(req.user.id.toString(), body.theme);
+    return { success: true, theme: updated.theme };
   }
 }

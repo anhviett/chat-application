@@ -30,6 +30,9 @@ export default defineConfig({
       "@/api": path.resolve(__dirname, "./src/api"),
       "@/sockets": path.resolve(__dirname, "./src/sockets"),
       "@/contexts": path.resolve(__dirname, "./src/contexts"),
+      "@/stores": path.resolve(__dirname, "./src/stores"),
+      "@/enums": path.resolve(__dirname, "./src/common/enums"),
+      "@/types": path.resolve(__dirname, "./src/common/types"),
     },
   },
 });

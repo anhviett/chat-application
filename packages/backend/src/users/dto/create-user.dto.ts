@@ -1,6 +1,12 @@
-import { IsEmail, IsString, IsNotEmpty, IsOptional, IsDateString, IsNumber } from 'class-validator';
+
+
+import { IsEmail, IsString, IsNotEmpty, IsOptional, IsDateString, IsNumber, IsIn } from 'class-validator';
 
 export class CreateUserDto {
+  @IsIn(['light', 'dark'])
+  @IsOptional()
+  theme?: 'light' | 'dark';
+
   @IsEmail()
   email: string;
 

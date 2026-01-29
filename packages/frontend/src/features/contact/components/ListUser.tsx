@@ -3,6 +3,7 @@ import { UserType } from "@/types/user-type";
 import { useUserList } from "@/common/hooks/useUserList";
 import AvatarMan from "@/assets/images/avatar-man.png";
 import AvatarFemale from "@/assets/images/avatar-female.webp";
+import { GENDER } from "@/enums/gender.enum";
 
 const groupUsersByLetter = (users: UserType[]) => {
   const grouped: { [key: string]: UserType[] } = {};
@@ -70,15 +71,14 @@ export default function ListUser() {
             <ul>
               {groupedUsers[letter].map((user) => (
                 <li
-                  key={user.id}
+                  key={user._id}
                   className="border-b py-2 px-2 hover:bg-gray-50 transition cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
-                    {user.gender}
                     <div className="w-10 h-10 rounded-full overflow-hidden bg-blue-500 text-white flex items-center justify-center font-semibold flex-shrink-0">
                       {user.gender ? (
                         <img
-                          src={user.gender ? AvatarFemale : AvatarMan}
+                          src={user.gender === GENDER.FEMALE ? AvatarFemale : AvatarMan}
                           alt={`${user.firstName} ${user.lastName}`}
                           className="w-full h-full object-cover"
                         />

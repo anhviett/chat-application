@@ -3,6 +3,7 @@ import eslint from '@eslint/js';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import eslintPluginImport from 'eslint-plugin-import';
 
 export default tseslint.config(
   {
@@ -11,6 +12,7 @@ export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
   eslintPluginPrettierRecommended,
+  eslintPluginImport,
   {
     languageOptions: {
       globals: {
@@ -23,12 +25,29 @@ export default tseslint.config(
         tsconfigRootDir: import.meta.dirname,
       },
     },
+    plugins: {
+      import: eslintPluginImport,
+    },
   },
   {
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'warn'
+      '@typescript-eslint/no-unsafe-argument': 'warn',
+      'import/no-unresolved': 'error'
     },
+    settings: {
+      'import/resolver': {
+        node: {
+          extensions: ['.ts', '.js', '.json'],
+        },
+        alias: {
+          map: [
+            ['@', './src']
+          ],
+          extensions: ['.ts', '.js', '.json']
+        }
+      }
+    }
   },
 );

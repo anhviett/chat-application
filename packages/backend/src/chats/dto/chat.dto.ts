@@ -87,7 +87,7 @@ export class SendMessageDto {
 
   @IsEnum(MessageType)
   @IsOptional()
-  type?: MessageType;
+  type?: MessageType | null;
 
   @IsArray()
   @IsString({ each: true })
@@ -96,6 +96,11 @@ export class SendMessageDto {
 
   @IsOptional()
   metadata?: Record<string, any>;
+
+  @IsOptional()
+  @IsMongoId()
+  @IsString()
+  recipientId?: string;
 }
 
 export class UpdateMessageDto {

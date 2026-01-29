@@ -1,5 +1,5 @@
-export function defineCancelApiObject<T extends Record<string, (...args: unknown[]) => Promise<unknown>>>(
-  apiObject: T,
+export function defineCancelApiObject(
+  apiObject: Record<string, Function>,
 ) {
   // A per-API-property object that exposes a cancellation handler
   type CancelEntry = {
@@ -33,5 +33,5 @@ export function defineCancelApiObject<T extends Record<string, (...args: unknown
   });
 
   // return typed object keyed by api properties
-  return cancelApiObject as Record<keyof T & string, CancelEntry>;
+  return cancelApiObject;
 }

@@ -58,8 +58,8 @@ export class CreateConversationsCollectionMigration implements Migration {
       const conversations: any[] = [
         {
           type: 'direct',
-          participants: [users[0].id, users[1].id],
-          createdBy: users[0].id,
+          participants: [users[0]._id, users[1]._id],
+          createdBy: users[0]._id,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -71,8 +71,8 @@ export class CreateConversationsCollectionMigration implements Migration {
           name: 'Development Team',
           description: 'Group for development team discussions',
           avatar: 'https://example.com/avatar.jpg',
-          participants: [users[0].id, users[1].id, users[2].id],
-          createdBy: users[0].id,
+          participants: [users[0]._id, users[1]._id, users[2]._id],
+          createdBy: users[0]._id,
           createdAt: new Date(),
           updatedAt: new Date(),
         });

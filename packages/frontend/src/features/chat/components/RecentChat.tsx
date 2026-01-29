@@ -7,13 +7,14 @@ import AvatarFemale from "@/assets/images/avatar-female.webp";
 import { useConversations } from "@/common/hooks/useConversations";
 import { setChatThread } from "@/stores/slices/chatUiSlice";
 import { useDispatch } from "react-redux";
+import { GENDER } from "@/enums/gender.enum";
 
 const RecentChat = () => {
   const dispatch = useDispatch();
   const { users } = useUserList();
   const { conversations, fetchConversation } = useConversations();
 
-  const handleSelectChat = async (user: { _id: string; name: string }) => {
+  const handleSelectChat = async (user: { _id: string }) => {
     await fetchConversation(user._id);
     const existingConv = conversations.find(
       (c) => c.participantId === user._id || c._id === user._id,
@@ -55,12 +56,12 @@ const RecentChat = () => {
               <div
                 className="flex flex-col"
                 onClick={() =>
-                  handleSelectChat({ _id: slide._id, name: slide.name })
+                  handleSelectChat({ _id: slide._id })
                 }
               >
                 <div className="text-center size-12 cursor-pointer relative before:content-[''] before:absolute before:bg-active before:size-3 before:rounded-full before:right-0 before:bottom-0 before:border-2 before:border-white">
                   <img
-                    src={slide.gender ? AvatarFemale : AvatarMan}
+                    src={slide.gender === GENDER.FEMALE ? AvatarFemale : AvatarMan}
                     alt={`${slide.firstName} ${slide.lastName}`}
                     className="rounded-full mx-auto"
                   />

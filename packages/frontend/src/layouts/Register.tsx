@@ -65,6 +65,7 @@ const Register = () => {
         lastName: inputs.lastName,
         email: inputs.email,
         password: inputs.password,
+        confirmPassword: inputs.confirmPassword,
       });
 
       navigate("/login", {

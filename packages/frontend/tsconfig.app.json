@@ -17,7 +17,7 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
+    "erasableSyntaxOnly": false,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "baseUrl": ".",
@@ -35,7 +35,9 @@
       "@/api/*": ["src/api/*"],
       "@/sockets/*": ["src/sockets/*"],
       "@/contexts/*": ["src/contexts/*"],
-      "@/types/*": ["src/types/*"]
+      "@/types/*": ["src/types/*"],
+      "@/enums/*": ["src/enums/*"],
+      "@/stores/*": ["src/stores/*"]
     }
   },
   "include": ["src"]

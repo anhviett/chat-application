@@ -4,6 +4,7 @@ import {
   useEffect,
 } from "react";
 import type { UserType } from "@/types/user-type";
+import { AuthContext } from "@/constants/auth-context.constant";
 import { useAppDispatch } from "@/stores/hooks";
 import {
   setCredentials,

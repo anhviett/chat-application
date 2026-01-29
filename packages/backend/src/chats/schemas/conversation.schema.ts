@@ -11,6 +11,8 @@ export enum ConversationType {
 
 @Schema({ timestamps: true })
 export class Conversation {
+  _id: Types.ObjectId;
+
   @Prop({ type: String, enum: ConversationType, required: true })
   type: ConversationType;
 

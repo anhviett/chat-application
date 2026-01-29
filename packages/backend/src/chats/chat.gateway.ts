@@ -337,7 +337,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const message = await this.chatService.sendMessage(userId, dto);
 
       // Dừng typing indicator của user này (vì đã gửi message rồi)
-      this.handleStopTyping(client, { conversation_id: dto.conversation_id });
+      if (dto.conversation_id) {
+        this.handleStopTyping(client, { conversation_id: dto.conversation_id });
+      }
 
       // ============================================
       // BROADCAST MESSAGE TỚI TẤT CẢ USERS TRONG CONVERSATION
@@ -357,7 +359,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       // Client có thể dùng tempId để update optimistic message
       client.emit('messageSent', {
         temp_id: dto['tempId'], // tempId do client tự tạo khi gửi
-        message_id: message.id, // messageId thật từ database
+        message_id: message._id, // messageId thật từ database
       });
 
       return { success: true, message };

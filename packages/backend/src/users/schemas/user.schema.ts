@@ -1,49 +1,43 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { HydratedDocument } from "mongoose";
-import { Interest } from "./interest.schema";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Interest } from './interest.schema';
 
-export type UserDocument = HydratedDocument<User>;
+export type UserDocument = User & Document;
 
 @Schema({
-    timestamps: true,
-    versionKey: false,
+  timestamps: true,
+  versionKey: false,
 })
-
 export class User {
+  @Prop({ required: true })
+  firstName: string;
 
-    firstName: string;
-    lastName: string;
+  @Prop({ required: true })
+  lastName: string;
 
-    @Prop({
-        required: true,
-        unique: true,
-    })
-    email: string;
+  @Prop({ required: true, unique: true })
+  email: string;
 
-    @Prop({
-        required: true,
-        select: false,
-    })
-    password: string;
+  @Prop({ required: true, select: false })
+  password: string;
 
-    @Prop({
-        select: false,
-    })
+  @Prop()
+  about?: string;
 
-    @Prop()
-    about: string;
+  @Prop()
+  birthday?: Date;
 
-    @Prop()
-    birthday: Date;
+  @Prop()
+  height?: number;
 
-    @Prop()
-    height: number;
+  @Prop()
+  weight?: number;
 
-    @Prop()
-    weight: number;
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Interest', autopopulate: true }] })
+  interests?: Interest[];
 
-    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Interest', autopopulate: true }])
-    interests: Interest[];
+  @Prop({ default: 'light' })
+  theme?: 'light' | 'dark';
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
