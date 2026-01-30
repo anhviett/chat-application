@@ -72,7 +72,8 @@ export class ChatService {
       return {
         ...conversation,
         id: conversation._id,
-        _id: conversation._id,
+        _id: conversation._id
+        ,
       };
     });
 
@@ -95,6 +96,7 @@ export class ChatService {
 
   // Send a message
   async sendMessage(userId: string, dto: SendMessageDto) {
+    console.log(userId, dto);
     const userObjectId = new Types.ObjectId(userId);
     let conversation: Conversation | null = null;
     let conversationObjectId: Types.ObjectId | null = null;

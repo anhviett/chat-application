@@ -85,6 +85,7 @@ const Conversation: React.FC<ConversationProps> = () => {
 
   const handleSendMessage = async () => {
     if (!message.trim() || !chatThread) return;
+    console.log('chatThread: ', chatThread);
 
     try {
       const payload: any = {

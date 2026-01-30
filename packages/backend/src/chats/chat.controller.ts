@@ -47,6 +47,7 @@ export class ChatController {
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
+  @UseGuards(JwtAuthGuard)
   @Get('conversations')
   async getUserConversations(@Request() req: any) {
     const userId = req.user?.id || null;

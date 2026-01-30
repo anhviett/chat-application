@@ -12,7 +12,7 @@ const AllChat = () => {
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
   const { typingUsers } = useTyping();
   const { conversations, fetchConversation } = useConversations();
-//   const chatThread = useSelector((state: RootState) => state.chatUi.chatThread);
+  // const chatThread = useSelector((state: RootState) => state.chatUi.chatThread);
 
   const handleSelectChat = async (user: { _id: string; name: string }) => {
     await fetchConversation(user._id);
@@ -80,9 +80,6 @@ const AllChat = () => {
                   <h6 className="font-semibold text-black">
                     {conversation.name}
                   </h6>
-                  <p className="text-sm text-gray-400">
-                    {conversation.birthday}
-                  </p>
                 </div>
                 <div className="flex justify-between items-center">
                   {isTyping ? (
