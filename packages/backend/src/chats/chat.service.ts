@@ -69,11 +69,16 @@ export class ChatService {
       .exec();
 
     return conversations.map(conversation => {
+      // Convert _id and participants' _id to string
+      const participants = (conversation.participants || []).map((p: any) => ({
+        ...p,
+        _id: p._id?.toString?.() || p._id,
+      }));
       return {
         ...conversation,
-        id: conversation._id,
-        _id: conversation._id
-        ,
+        id: conversation._id?.toString?.() || conversation._id,
+        _id: conversation._id?.toString?.() || conversation._id,
+        participants,
       };
     });
 
@@ -101,9 +106,9 @@ export class ChatService {
     let conversation: Conversation | null = null;
     let conversationObjectId: Types.ObjectId | null = null;
 
-    // Nếu có conversation_id thì tìm conversation
-    if (dto.conversation_id) {
-      conversationObjectId = new Types.ObjectId(dto.conversation_id);
+    // Nếu có conversationId thì tìm conversation
+    if (dto.conversationId) {
+      conversationObjectId = new Types.ObjectId(dto.conversationId);
       conversation = await this.conversationModel.findOne({
         _id: conversationObjectId,
         participants: userObjectId,

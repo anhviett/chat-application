@@ -81,6 +81,10 @@ export class SendMessageDto {
   @IsMongoId()
   conversation_id?: string;
 
+  @IsOptional()
+  @IsMongoId()
+  conversationId?: string;
+
   @IsString()
   @IsNotEmpty()
   content: string;

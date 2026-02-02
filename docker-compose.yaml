@@ -27,8 +27,9 @@ services:
     ports:
       - "3001:3001"
     # Fix: Remove the incorrect volume mount and use correct path
-    # volumes:
-    #   - ./backend:/app  # This was wrong - should be ./packages/backend if needed
+    volumes:
+      - ./packages/backend:/app
+      - /app/node_modules
     depends_on:
       mongo:
         condition: service_started

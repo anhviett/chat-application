@@ -164,10 +164,10 @@ const Conversation: React.FC<ConversationProps> = () => {
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[url('https://dreamschat.dreamstechnologies.com/react/template/assets/bg-01-Cbualscf.png')]">
         {messages.map((m) => {
           if (!m) return null; // Safety check
-          const isMe = m.sender?.id === user?._id;
+          const isMe = m.sender?._id === user?._id;
           return (
             <div
-              key={m.id}
+              key={m._id}
               className={`flex ${isMe ? "justify-end" : "justify-start"}`}
             >
               {!isMe && m.sender && (

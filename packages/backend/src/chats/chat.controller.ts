@@ -111,6 +111,7 @@ export class ChatController {
   // ============ MESSAGE ENDPOINTS ============
 
   @Get('conversations/:id/messages')
+  @UseGuards(JwtAuthGuard)
   async getMessages(
     @Request() req,
     @Param('id') conversationId: string,
