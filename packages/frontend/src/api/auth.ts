@@ -39,6 +39,19 @@ export const authApi = {
 
     return response.data;
   },
+  refreshToken: async function (token: string, cancel = false) {
+    const response = await api.request({
+      url: "/auth/refresh-token",
+      method: "POST",
+      data: { token },
+      signal: cancel
+        ? cancelApiObject[this.refreshToken.name].handleRequestCancellation()
+            .signal
+        : undefined,
+    });
+
+    return response.data;
+  }
 };
 
 const cancelApiObject = defineCancelApiObject(authApi);

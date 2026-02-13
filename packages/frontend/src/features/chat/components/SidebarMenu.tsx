@@ -59,7 +59,7 @@ const SidebarMenu: React.FC<SidebarMenuProps> = () => {
         <button
           className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-2 hover:border-purple-1 transition-all"
           title="My Profile"
-          onClick={() => logout()}
+          onClick={logout}
         >
           <img
             src="https://i.pravatar.cc/150?img=1"

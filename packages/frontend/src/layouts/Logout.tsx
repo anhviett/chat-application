@@ -1,15 +1,12 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/common/hooks/useAuth";
 
 const Logout = () => {
-  const { logout } = useAuth();
-  const navigate = useNavigate();
 
+  const { logout } = useAuth();
   useEffect(() => {
     logout();
-    navigate("/login");
-  }, [logout, navigate]);
+  }, [logout]);
 
   return (
     <div className="flex items-center justify-center h-screen">

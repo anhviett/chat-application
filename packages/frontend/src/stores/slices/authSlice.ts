@@ -59,7 +59,6 @@ const authSlice = createSlice({
       state.loading = action.payload;
     },
 
-    // Clear all auth data (logout)
     clearAuth: (state) => {
       state.user = null;
       state.accessToken = null;

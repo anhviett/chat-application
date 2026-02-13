@@ -120,7 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw error;
     }
   };
-
+  
   return (
     <AuthContext.Provider
       value={{ user, accessToken, login, logout, refreshAccessToken, loading }}

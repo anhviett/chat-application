@@ -1,15 +1,15 @@
 import axios from "axios";
+import { authApi } from "../auth";
 
 const apiUrl = import.meta.env.VITE_BACKEND_URL || "https://dummyjson.com";
-
 export const api = axios.create({
   baseURL: `${apiUrl}`,
-  withCredentials: false, // ✅ Include cookies (tương đương credentials: 'include' của fetch)
+  withCredentials: false,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
   },
-  timeout: 15000, // 15 seconds timeout cho external API
+  timeout: 15000,
 });
 
 // defining a custom error handler for all APIs
@@ -60,23 +60,13 @@ api.interceptors.response.use(
 
       try {
         // Attempt to refresh the token
-        const refreshToken = localStorage.getItem("refreshToken"); // ✅ Đổi từ 'refresh_token'
+        const refreshToken = localStorage.getItem("refreshToken");
 
         if (!refreshToken) {
           throw new Error("No refresh token available");
         }
 
-        const response = await axios.post(
-          `${apiUrl}/auth/refresh-token`,
-          {
-            token: refreshToken,
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          },
-        );
+        const response =  await authApi.refreshToken(refreshToken);
 
         const { accessToken } = response.data;
         localStorage.setItem("accessToken", accessToken);
